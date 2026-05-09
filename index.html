@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuickPDF | All-in-One Document Tools</title>
+    <meta name="description"
+        content="Free online PDF tools: Extract text, convert images, Word, Excel, PPT to PDF, merge and edit PDF files.">
+    <link rel="stylesheet" href="styles.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Core Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    </script>
+</head>
+
+<body>
+    <main class="container">
+
+        <!-- ─── Header & Navigation ─── -->
+        <header class="app-header"
+            style="display:flex; flex-direction:column; align-items:center; gap:1rem; padding-bottom:3rem; position:relative;">
+            <div style="position:absolute; top:0; right:0;">
+                <button id="theme-toggle" class="btn btn-secondary"
+                    style="border-radius:50%; width:48px; height:48px; padding:0; display:flex; align-items:center; justify-content:center; box-shadow:var(--shadow-md);">
+                    <i class="fas fa-moon" id="theme-icon"></i>
+                </button>
+            </div>
+            <div class="version-badge">v2.0</div>
+            <div style="display:flex; align-items:center; gap:1.25rem;">
+                <!-- Ultra-Simple QuickPDF Logo -->
+                <div
+                    style="width:56px; height:56px; background:#6366f1; border-radius:14px; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 16px rgba(99,102,241,0.25);">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M14 2H6C4.89543 2 4 2.89543 4 4V20C4 21.1046 4.89543 22 6 22H18C19.1046 22 20 21.1046 20 20V8L14 2Z"
+                            stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M13 18L10 13H14L11 8" stroke="white" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                </div>
+                <div style="text-align:left;">
+                    <h1 style="margin:0; font-size:2.8rem; letter-spacing:-0.03em; font-weight:800; line-height:1;">
+                        <span style="color:#6366f1;">Quick</span>PDF</h1>
+                    <p style="margin:5px 0 0; opacity:0.7; font-weight:600; font-size:0.95rem; color:#475569;">Pro
+                        Document Intelligence Studio</p>
+                </div>
+            </div>
+        </header>
+
+        <nav class="tool-nav">
+            <button class="nav-btn extractor-btn active" data-tool="extractor-tool">
+                <i class="fas fa-file-export"></i> PDF Extractor
+            </button>
+            <button class="nav-btn image-btn" data-tool="image-tool">
+                <i class="fas fa-image"></i> Image to PDF
+            </button>
+            <button class="nav-btn word-btn" data-tool="word-tool">
+                <i class="fas fa-file-word"></i> Word to PDF
+            </button>
+            <button class="nav-btn excel-btn" data-tool="excel-tool">
+                <i class="fas fa-file-excel"></i> Excel to PDF
+            </button>
+            <button class="nav-btn ppt-btn" data-tool="ppt-tool">
+                <i class="fas fa-file-powerpoint"></i> PowerPoint to PDF
+            </button>
+            <button class="nav-btn merge-btn" data-tool="merge-tool">
+                <i class="fas fa-object-group"></i> Merge PDF
+            </button>
+            <button class="nav-btn edit-btn" data-tool="edit-tool">
+                <i class="fas fa-edit"></i> Edit PDF
+            </button>
+            <button class="nav-btn lock-btn" data-tool="lock-tool">
+                <i class="fas fa-lock"></i> Lock PDF
+            </button>
+        </nav>
+
+        <!-- ═══════════════════════════════════ -->
+        <!-- TOOL 1 · PDF Extractor             -->
+        <!-- ═══════════════════════════════════ -->
+        <div id="extractor-tool" class="tool-container active">
+            <div class="drop-zone" id="extract-drop-zone">
+                <div class="drop-zone__icon"><i class="fas fa-file-pdf" style="color:#6366f1;"></i></div>
+                <span class="drop-zone__prompt">Drop your PDF file here</span>
+                <span class="drop-zone__subtext">or click to browse — supports any PDF</span>
+                <input type="file" id="pdfFile" accept=".pdf" hidden>
+            </div>
+            <div class="file-card-wrapper" id="extract-file-card"></div>
+            <div id="extract-action-container" class="text-center mt-2 hidden">
+                <button id="start-extract-btn" class="btn btn-primary btn-lg"><i class="fas fa-magic"></i> Extract Text
+                    Now</button>
+            </div>
+
+            <div id="extract-loader" class="loader-wrapper hidden">
+                <div class="loader"></div>
+                <p>Analyzing document…</p>
+            </div>
+
+            <div id="extract-results" class="hidden">
+                <div class="stats-container">
+                    <div class="stat-card">
+                        <div class="stat-label">Pages</div>
+                        <div class="stat-value" id="stat-pages">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Words</div>
+                        <div class="stat-value" id="stat-words">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Characters</div>
+                        <div class="stat-value" id="stat-chars">0</div>
+                    </div>
+                </div>
+
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="tab-text">
+                        <i class="fas fa-file-alt"></i> Extracted Text
+                    </button>
+                    <button class="tab-btn" data-tab="tab-summary">
+                        <i class="fas fa-magic"></i> AI Summary
+                    </button>
+                </div>
+
+                <!-- Text Tab -->
+                <div id="tab-text" class="tab-panel">
+                    <div class="toolbar">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="search-input" placeholder="Search in text…">
+                        </div>
+                        <div class="actions">
+                            <button id="copy-text-btn" class="btn btn-secondary"><i class="fas fa-copy"></i>
+                                Copy</button>
+                            <button id="download-text-btn" class="btn btn-primary"><i class="fas fa-download"></i>
+                                Download</button>
+                        </div>
+                    </div>
+                    <div class="text-container" id="text-output"></div>
+                </div>
+
+                <!-- Summary Tab -->
+                <div id="tab-summary" class="tab-panel hidden">
+                    <div class="summary-control">
+                        <span>Summary length:</span>
+                        <input type="range" id="summary-range" min="1" max="5" value="3">
+                        <strong id="range-label">Medium</strong>
+                    </div>
+                    <div class="toolbar">
+                        <div></div>
+                        <div class="actions">
+                            <button id="copy-summary-btn" class="btn btn-secondary"><i class="fas fa-copy"></i>
+                                Copy</button>
+                            <button id="download-summary-btn" class="btn btn-primary"><i class="fas fa-download"></i>
+                                Download</button>
+                        </div>
+                    </div>
+                    <div class="text-container" id="summary-output"></div>
+                </div>
+
+                <div class="text-center mt-2" style="padding-bottom:1rem;">
+                    <button id="extract-reset-btn" class="btn btn-secondary"><i class="fas fa-redo"></i> Process Another
+                        File</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════ -->
+        <!-- TOOL 2 · Image to PDF              -->
+        <!-- ═══════════════════════════════════ -->
+        <div id="image-tool" class="tool-container">
+            <div class="drop-zone" id="image-drop-zone">
+                <div class="drop-zone__icon"><i class="fas fa-images" style="color:#ec4899;"></i></div>
+                <span class="drop-zone__prompt">Drop images here</span>
+                <span class="drop-zone__subtext">Supports PNG, JPG, JPEG, WEBP — select multiple</span>
+                <input type="file" id="imageFiles" accept="image/*" multiple hidden>
+            </div>
+            <div class="file-card-wrapper" id="image-file-card"></div>
+            <div id="image-action-container" class="text-center mt-2 hidden">
+                <button id="trigger-image-convert-btn" class="btn btn-primary btn-lg"><i class="fas fa-magic"></i>
+                    Convert Images to PDF</button>
+            </div>
+
+            <div id="image-preview-section" class="hidden">
+                <div class="toolbar" style="padding: 1rem 0;">
+                    <h3>Selected Images (<span id="image-count">0</span>)</h3>
+                    <div class="actions">
+                        <button id="clear-images-btn" class="btn btn-secondary"><i class="fas fa-trash"></i>
+                            Clear</button>
+                        <button id="convert-images-btn" class="btn btn-primary"><i class="fas fa-file-pdf"></i> Convert
+                            to PDF</button>
+                    </div>
+                </div>
+                <div class="image-grid" id="image-grid"></div>
+
+                <div id="image-download-banner" class="download-banner hidden">
+                    <h3><i class="fas fa-check-circle"></i> PDF Created Successfully!</h3>
+                    <p>Your images have been combined into a single PDF file.</p>
+                    <a id="image-download-btn" class="btn btn-success" href="#" download="images.pdf">
+                        <i class="fas fa-download"></i> Download PDF
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════ -->
+        <!-- TOOL 3 · Word to PDF               -->
+        <!-- ═══════════════════════════════════ -->
+        <div id="word-tool" class="tool-container">
+            <div class="drop-zone" id="word-drop-zone">
+                <div class="drop-zone__icon"><i class="fas fa-file-word" style="color:#2b579a;"></i></div>
+                <span class="drop-zone__prompt">Drop your Word document</span>
+                <span class="drop-zone__subtext">Supports .docx files</span>
+                <input type="file" id="wordFile" accept=".docx" hidden>
+            </div>
+            <div class="file-card-wrapper" id="word-file-card"></div>
+            <div id="word-action-container" class="text-center mt-2 hidden">
+                <button id="start-word-btn" class="btn btn-primary btn-lg"><i class="fas fa-sync-alt"></i> Convert to
+                    PDF</button>
+            </div>
+
+            <div id="word-loader" class="loader-wrapper hidden">
+                <div class="loader"></div>
+                <p>Converting Word to PDF…</p>
+            </div>
+
+            <div id="word-download-banner" class="download-banner hidden">
+                <h3><i class="fas fa-check-circle"></i> Conversion Complete!</h3>
+                <p>Your Word document has been converted to PDF.</p>
+                <a id="word-download-btn" class="btn btn-success" href="#" download="document.pdf">
+                    <i class="fas fa-download"></i> Download PDF
+                </a>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════ -->
+        <!-- TOOL 4 · Excel to PDF              -->
+        <!-- ═══════════════════════════════════ -->
+        <div id="excel-tool" class="tool-container">
+            <div class="drop-zone" id="excel-drop-zone">
+                <div class="drop-zone__icon"><i class="fas fa-file-excel" style="color:#217346;"></i></div>
+                <span class="drop-zone__prompt">Drop your Excel spreadsheet</span>
+                <span class="drop-zone__subtext">Supports .xlsx files</span>
+                <input type="file" id="excelFile" accept=".xlsx,.xls" hidden>
+            </div>
+            <div class="file-card-wrapper" id="excel-file-card"></div>
+            <div id="excel-action-container" class="text-center mt-2 hidden">
+                <button id="start-excel-btn" class="btn btn-primary btn-lg"><i class="fas fa-file-excel"></i> Convert
+                    Excel to PDF</button>
+            </div>
+            <div id="excel-loader" class="loader-wrapper hidden">
+                <div class="loader"></div>
+                <p>Processing spreadsheet…</p>
+            </div>
+            <div id="excel-download-banner" class="download-banner hidden">
+                <h3><i class="fas fa-check-circle"></i> Excel Converted!</h3>
+                <a id="excel-download-btn" class="btn btn-success" href="#" download="spreadsheet.pdf">
+                    <i class="fas fa-download"></i> Download PDF
+                </a>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════ -->
+        <!-- TOOL 5 · PPT to PDF                -->
+        <!-- ═══════════════════════════════════ -->
+        <div id="ppt-tool" class="tool-container">
+            <div class="drop-zone" id="ppt-drop-zone">
+                <div class="drop-zone__icon"><i class="fas fa-file-powerpoint" style="color:#b7472a;"></i></div>
+                <span class="drop-zone__prompt">Drop your PowerPoint file</span>
+                <span class="drop-zone__subtext">Supports .pptx files</span>
+                <input type="file" id="pptFile" accept=".pptx,.ppt" hidden>
+            </div>
+            <div class="file-card-wrapper" id="ppt-file-card"></div>
+            <div id="ppt-action-container" class="text-center mt-2 hidden">
+                <button id="start-ppt-btn" class="btn btn-primary btn-lg"><i class="fas fa-file-powerpoint"></i> Convert
+                    PPT to PDF</button>
+            </div>
+            <div id="ppt-loader" class="loader-wrapper hidden">
+                <div class="loader"></div>
+                <p>Processing presentation…</p>
+            </div>
+            <div id="ppt-download-banner" class="download-banner hidden">
+                <h3><i class="fas fa-check-circle"></i> Presentation Converted!</h3>
+                <a id="ppt-download-btn" class="btn btn-success" href="#" download="presentation.pdf">
+                    <i class="fas fa-download"></i> Download PDF
+                </a>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════ -->
+        <!-- TOOL 6 · Merge PDF                 -->
+        <!-- ═══════════════════════════════════ -->
+        <div id="merge-tool" class="tool-container">
+            <div class="drop-zone" id="merge-drop-zone">
+                <div class="drop-zone__icon"><i class="fas fa-object-group" style="color:#8b5cf6;"></i></div>
+                <span class="drop-zone__prompt">Drop multiple PDF files here</span>
+                <span class="drop-zone__subtext">Select 2 or more PDF files to combine</span>
+                <input type="file" id="mergeFiles" accept=".pdf" multiple hidden>
+            </div>
+            <div class="file-card-wrapper" id="merge-file-card"></div>
+
+            <div id="merge-list-section" class="hidden" style="margin-top:2rem;">
+                <div class="toolbar">
+                    <h3>Files to Merge (<span id="merge-count">0</span>)</h3>
+                    <div class="actions">
+                        <button id="add-more-files-btn" class="btn btn-secondary"><i class="fas fa-plus"></i> Add
+                            More</button>
+                        <button id="merge-btn" class="btn btn-primary"><i class="fas fa-object-group"></i> Merge
+                            All</button>
+                    </div>
+                </div>
+                <div id="merge-file-list" style="margin-top:1rem;"></div>
+            </div>
+
+            <div id="merge-loader" class="loader-wrapper hidden">
+                <div class="loader"></div>
+                <p>Merging PDFs…</p>
+            </div>
+
+            <div id="merge-download-banner" class="download-banner hidden">
+                <h3><i class="fas fa-check-circle"></i> Merge Complete!</h3>
+                <p>All your PDF files have been combined into one.</p>
+                <a id="merge-download-btn" class="btn btn-success" href="#" download="merged.pdf">
+                    <i class="fas fa-download"></i> Download Merged PDF
+                </a>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════ -->
+        <!-- TOOL 7 · Edit PDF                  -->
+        <!-- ═══════════════════════════════════ -->
+        <div id="edit-tool" class="tool-container">
+            <div class="drop-zone" id="edit-drop-zone">
+                <div class="drop-zone__icon"><i class="fas fa-edit" style="color:#e11d48;"></i></div>
+                <span class="drop-zone__prompt">Drop PDF to Edit</span>
+                <span class="drop-zone__subtext">Rotate or delete pages visually</span>
+                <input type="file" id="editFile" accept=".pdf" hidden>
+            </div>
+            <div class="file-card-wrapper" id="edit-file-card"></div>
+
+            <div id="edit-loader" class="loader-wrapper hidden">
+                <div class="loader"></div>
+                <p>Loading PDF pages…</p>
+            </div>
+
+            <div id="edit-workspace" class="hidden"
+                style="margin-top:2rem; display:flex; gap:2rem; background:#f1f5f9; border-radius:30px; padding:1.5rem; min-height:80vh; border:1px solid #e2e8f0;">
+                <!-- Left Sidebar for Tools -->
+                <div
+                    style="width:260px; background:white; border-radius:24px; padding:1.5rem; display:flex; flex-direction:column; gap:1.5rem; box-shadow:0 10px 25px rgba(0,0,0,0.03);">
+                    <div style="border-bottom:1px solid #f1f5f9; padding-bottom:1rem;">
+                        <h4 style="margin:0; font-size:1.1rem; font-weight:800; color:#0f172a;">Editor Studio</h4>
+                        <p id="edit-filename"
+                            style="margin:4px 0 0; font-size:0.75rem; color:#64748b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                            document.pdf</p>
+                    </div>
+
+                    <div style="display:flex; flex-direction:column; gap:0.75rem;">
+                        <label
+                            style="font-size:0.75rem; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:0.05em;">Global
+                            Actions</label>
+                        <button id="edit-save-btn" class="btn btn-primary"
+                            style="width:100%; justify-content:center; padding:0.9rem;">
+                            <i class="fas fa-download"></i> Save & Download
+                        </button>
+                        <button id="edit-reset-btn" class="btn btn-secondary"
+                            style="width:100%; justify-content:center; padding:0.9rem; border:1px solid #e2e8f0;">
+                            <i class="fas fa-undo"></i> Reset All
+                        </button>
+                    </div>
+
+                    <div
+                        style="margin-top:auto; background:#f8fafc; padding:1rem; border-radius:16px; border:1px dashed #e2e8f0;">
+                        <p style="margin:0; font-size:0.75rem; color:#64748b; line-height:1.4;">
+                            <i class="fas fa-info-circle" style="color:#6366f1;"></i> Tip: Hover over a page to rotate
+                            or delete it. Click "Annotate" to add text.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Right Main Grid -->
+                <div
+                    style="flex:1; background:white; border-radius:24px; padding:1.5rem; overflow-y:auto; box-shadow:0 10px 25px rgba(0,0,0,0.03); max-height:80vh;">
+                    <div class="pages-grid" id="pages-grid" style="border:none; padding:0; background:transparent;">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════ -->
+        <!-- TOOL 8 · Lock PDF (Password Protect) -->
+        <!-- ═══════════════════════════════════ -->
+        <div id="lock-tool" class="tool-container">
+            <div class="drop-zone" id="lock-drop-zone">
+                <div class="drop-zone__icon"><i class="fas fa-lock" style="color:#f59e0b;"></i></div>
+                <span class="drop-zone__prompt">Drop PDF to Password Protect</span>
+                <span class="drop-zone__subtext">Your file never leaves your device — 100% private</span>
+                <input type="file" id="lockFile" accept=".pdf" hidden>
+            </div>
+            <div class="file-card-wrapper" id="lock-file-card"></div>
+            <div id="lock-action-container" class="text-center mt-2 hidden">
+                <button id="start-lock-btn" class="btn btn-primary btn-lg"><i class="fas fa-shield-alt"></i> Protect
+                    this PDF</button>
+            </div>
+
+            <div id="lock-form" class="hidden"
+                style="margin-top:2rem; background:white; border-radius:20px; padding:2.5rem; box-shadow:0 10px 30px rgba(0,0,0,0.08); max-width:500px; margin-left:auto; margin-right:auto;">
+                <div style="text-align:center; margin-bottom:2rem;">
+                    <i class="fas fa-file-pdf" style="font-size:3rem; color:#f59e0b;"></i>
+                    <h3 id="lock-filename" style="margin-top:0.75rem; font-size:1.1rem;">document.pdf</h3>
+                </div>
+
+                <div style="margin-bottom:1.25rem;">
+                    <label style="display:block; font-weight:600; margin-bottom:0.5rem;"><i class="fas fa-key"
+                            style="color:#f59e0b; margin-right:6px;"></i> Password</label>
+                    <div style="position:relative;">
+                        <input type="password" id="lock-password" placeholder="Enter a strong password…"
+                            style="width:100%; padding:0.8rem 3rem 0.8rem 1rem; border:2px solid #e2e8f0; border-radius:12px; font-size:1rem; outline:none; font-family:'Outfit',sans-serif; transition:0.2s;"
+                            onfocus="this.style.borderColor='#f59e0b'" onblur="this.style.borderColor='#e2e8f0'">
+                        <button onclick="togglePwd('lock-password', this)"
+                            style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#64748b;">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div style="margin-bottom:2rem;">
+                    <label style="display:block; font-weight:600; margin-bottom:0.5rem;"><i class="fas fa-check-double"
+                            style="color:#f59e0b; margin-right:6px;"></i> Confirm Password</label>
+                    <div style="position:relative;">
+                        <input type="password" id="lock-password-confirm" placeholder="Re-enter password…"
+                            style="width:100%; padding:0.8rem 3rem 0.8rem 1rem; border:2px solid #e2e8f0; border-radius:12px; font-size:1rem; outline:none; font-family:'Outfit',sans-serif; transition:0.2s;"
+                            onfocus="this.style.borderColor='#f59e0b'" onblur="this.style.borderColor='#e2e8f0'">
+                        <button onclick="togglePwd('lock-password-confirm', this)"
+                            style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#64748b;">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div
+                    style="background:#fef3c7; border:1px solid #fcd34d; border-radius:10px; padding:1rem; margin-bottom:1.5rem; font-size:0.88rem; color:#92400e;">
+                    <i class="fas fa-shield-alt"></i> <strong>AES-256 Encryption</strong> — Anyone trying to open this
+                    PDF will need the password. Keep it safe!
+                </div>
+
+                <button id="lock-btn" class="btn btn-primary"
+                    style="width:100%; justify-content:center; padding:1rem; font-size:1rem;">
+                    <i class="fas fa-lock"></i> Lock & Download PDF
+                </button>
+            </div>
+
+            <div id="lock-loader" class="loader-wrapper hidden">
+                <div class="loader" style="border-top-color:#f59e0b;"></div>
+                <p>Encrypting PDF…</p>
+            </div>
+
+            <div id="lock-download-banner" class="download-banner hidden"
+                style="background:linear-gradient(135deg,#fffbeb,#fef3c7);border-color:#fcd34d; margin-top:2rem;">
+                <h3 style="color:#b45309;"><i class="fas fa-lock"></i> PDF Locked Successfully!</h3>
+                <p style="color:#92400e;">This PDF is now password-protected. Share it safely.</p>
+                <a id="lock-download-btn" class="btn" style="background:#f59e0b;color:white;" href="#"
+                    download="locked.pdf">
+                    <i class="fas fa-download"></i> Download Locked PDF
+                </a>
+            </div>
+        </div>
+
+        <!-- ─── Annotation Modal (Creative Suite Style) ─── -->
+        <div id="anno-modal" class="hidden"
+            style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(15, 23, 42, 0.95);z-index:9999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(12px);">
+            <div
+                style="background:#f8fafc; width:98%; max-width:1280px; height:95vh; border-radius:24px; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 50px 100px rgba(0,0,0,0.5); border:1px solid rgba(255,255,255,0.1);">
+
+                <!-- Modal Header / Toolbar -->
+                <div
+                    style="padding:0.75rem 1.5rem; background:#0f172a; color:white; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #1e293b;">
+                    <div style="display:flex; align-items:center; gap:1.25rem;">
+                        <div style="display:flex; flex-direction:column;">
+                            <span style="font-size:0.85rem; font-weight:800; letter-spacing:0.02em; color:#6366f1;">PDF
+                                EDITOR</span>
+                            <span style="font-size:0.7rem; color:#94a3b8; font-weight:600;">Page <span
+                                    id="modal-page-num">1</span></span>
+                        </div>
+
+                        <div style="width:1px; height:32px; background:#334155;"></div>
+
+                        <!-- Toolset: Zoom -->
+                        <div
+                            style="display:flex; align-items:center; gap:0.5rem; background:rgba(255,255,255,0.05); padding:6px; border-radius:16px;">
+                            <button id="anno-zoom-out" class="btn btn-secondary btn-sm" title="Zoom Out"
+                                style="background:transparent; border:none; padding:8px;"><i
+                                    class="fas fa-search-minus"></i></button>
+                            <span id="anno-zoom-val"
+                                style="font-size:0.75rem; font-weight:700; width:40px; text-align:center; color:#94a3b8;">100%</span>
+                            <button id="anno-zoom-in" class="btn btn-secondary btn-sm" title="Zoom In"
+                                style="background:transparent; border:none; padding:8px;"><i
+                                    class="fas fa-search-plus"></i></button>
+                        </div>
+
+                        <div style="width:1px; height:32px; background:#334155;"></div>
+
+                        <!-- Toolset: Add items -->
+                        <div
+                            style="display:flex; align-items:center; gap:0.75rem; background:rgba(255,255,255,0.05); padding:6px; border-radius:16px;">
+                            <button id="anno-add-text" class="btn"
+                                style="background:#6366f1; color:white; border:none; padding:8px 16px; border-radius:12px; font-weight:700; display:flex; align-items:center; gap:8px; transition:0.2s;">
+                                <i class="fas fa-font" style="font-size:1.1rem;"></i> <span>Add Text</span>
+                            </button>
+                            <button id="anno-add-rect" class="btn" title="Add Rectangle"
+                                style="background:#ec4899; color:white; border:none; padding:8px 12px; border-radius:10px; transition:0.2s;">
+                                <i class="fas fa-square" style="font-size:1rem;"></i>
+                            </button>
+                            <button id="anno-add-circle" class="btn" title="Add Circle"
+                                style="background:#8b5cf6; color:white; border:none; padding:8px 12px; border-radius:10px; transition:0.2s;">
+                                <i class="fas fa-circle" style="font-size:1rem;"></i>
+                            </button>
+                            <button id="anno-add-line" class="btn" title="Add Line"
+                                style="background:#10b981; color:white; border:none; padding:8px 12px; border-radius:10px; transition:0.2s;">
+                                <i class="fas fa-slash" style="font-size:1rem;"></i>
+                            </button>
+                            <button id="anno-add-image" class="btn" title="Add Photo"
+                                style="background:#f59e0b; color:white; border:none; padding:8px 12px; border-radius:10px; transition:0.2s;">
+                                <i class="fas fa-image" style="font-size:1rem;"></i>
+                            </button>
+                            <input type="file" id="anno-image-input" accept="image/*" class="hidden">
+                        </div>
+
+                        <!-- Toolset: Styling -->
+                        <div class="anno-control-panel"
+                            style="background:#1e293b; padding:4px 12px; border-radius:12px; height:40px;">
+                            <!-- Color -->
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <input type="color" id="anno-color" value="#6366f1" title="Pick Color"
+                                    style="width:28px; height:28px; border:none; border-radius:6px; cursor:pointer; background:none;">
+                            </div>
+                            <div style="width:1px; height:20px; background:#334155; margin:0 8px;"></div>
+                            <!-- Font Size -->
+                            <div style="display:flex; align-items:center; gap:8px; color:#94a3b8;">
+                                <i class="fas fa-text-height" style="font-size:0.8rem;"></i>
+                                <select id="anno-font-size"
+                                    style="background:transparent; border:none; color:white; font-size:0.85rem; font-weight:600; cursor:pointer; outline:none;">
+                                    <option value="12">12</option>
+                                    <option value="16">16</option>
+                                    <option value="20">20</option>
+                                    <option value="24" selected>24</option>
+                                    <option value="32">32</option>
+                                    <option value="48">48</option>
+                                </select>
+                            </div>
+                            <div style="width:1px; height:20px; background:#334155; margin:0 8px;"></div>
+                            <!-- Opacity -->
+                            <div style="display:flex; align-items:center; gap:8px; color:#94a3b8;">
+                                <i class="fas fa-fill-drip" style="font-size:0.8rem;"></i>
+                                <input type="range" id="anno-opacity" min="0.1" max="1" step="0.1" value="0.4"
+                                    title="Opacity" style="width:50px; cursor:pointer; accent-color:#6366f1;">
+                            </div>
+                            <div style="width:1px; height:20px; background:#334155; margin:0 8px;"></div>
+                            <!-- Border -->
+                            <div style="display:flex; align-items:center; gap:8px; color:#94a3b8;">
+                                <i class="fas fa-minus" style="font-size:0.8rem;"></i>
+                                <input type="range" id="anno-border" min="1" max="10" step="1" value="2"
+                                    title="Border Width" style="width:50px; cursor:pointer; accent-color:#6366f1;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display:flex; align-items:center; gap:1rem;">
+                        <button id="anno-save" class="btn btn-primary"
+                            style="padding:0.6rem 1.5rem; font-size:0.85rem;">
+                            <i class="fas fa-check-circle" style="margin-right:6px;"></i> Apply Changes
+                        </button>
+                        <button id="anno-close"
+                            style="background:none; border:none; color:#94a3b8; cursor:pointer; font-size:1.2rem; transition:0.2s;"
+                            onmouseover="this.style.color='white'" onmouseout="this.style.color='#94a3b8'">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Main Canvas Area -->
+                <div
+                    style="flex:1; background:#1e293b; display:flex; align-items:center; justify-content:center; overflow:auto; padding:4rem;">
+                    <div id="anno-canvas-wrapper"
+                        style="position:relative; background:white; box-shadow:0 30px 100px rgba(0,0,0,0.5); transform: scale(1.05);">
+                        <canvas id="anno-canvas"></canvas>
+                        <div id="anno-overlays"
+                            style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bottom Bar / Status -->
+                <div
+                    style="padding:0.5rem 1.5rem; background:#0f172a; border-top:1px solid #1e293b; display:flex; justify-content:center; gap:2rem; color:#64748b; font-size:0.75rem; font-weight:600;">
+                    <span><i class="fas fa-mouse-pointer" style="margin-right:4px;"></i> DRAG TO MOVE</span>
+                    <span><i class="fas fa-expand-alt" style="margin-right:4px;"></i> RESIZE BOTTOM-RIGHT</span>
+                    <span><i class="fas fa-trash" style="margin-right:4px;"></i> HOVER TO DELETE</span>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer
+        style="margin-top:4rem; padding:3rem 2rem; background:var(--surface); border-top:1px solid var(--border); text-align:center;">
+        <div
+            style="max-width:1100px; margin:0 auto; display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:2rem;">
+
+            <!-- Copyright & Info -->
+            <div style="text-align:left; flex:1; min-width:250px;">
+                <p style="margin:0; font-size:1rem; color:var(--text-primary); font-weight:800;">© 2026 QuickPDF</p>
+                <p style="margin:5px 0 0; font-size:0.85rem; color:var(--text-secondary); font-weight:500;">
+                    <i class="fas fa-shield-alt" style="color:var(--success); margin-right:6px;"></i>
+                    We respect your privacy — your files are never stored.
+                </p>
+            </div>
+
+            <!-- Contact & Links -->
+            <div
+                style="display:flex; flex-direction:column; align-items:flex-end; gap:0.6rem; flex:1; min-width:250px;">
+                <a href="mailto:quickpdf.contact@gmail.com"
+                    style="font-size:0.9rem; color:#6366f1; font-weight:700; text-decoration:none; display:flex; align-items:center; gap:8px;">
+                    <i class="fas fa-envelope"></i> quickpdf.contact@gmail.com
+                </a>
+                <div style="display:flex; gap:1.5rem; align-items:center;">
+                    <a href="#" id="privacy-link"
+                        style="font-size:0.95rem; color:#6366f1; font-weight:700; text-decoration:none; border-bottom:2px solid rgba(99,102,241,0.2);">Privacy
+                        Policy</a>
+                    <a href="#" id="tos-link"
+                        style="font-size:0.95rem; color:#6366f1; font-weight:700; text-decoration:none; border-bottom:2px solid rgba(99,102,241,0.2);">Terms
+                        of Service</a>
+                </div>
+            </div>
+
+        </div>
+    </footer>
+
+    <!-- SECTION: Privacy Policy -->
+    <div id="privacy-section" class="tool-container"
+        style="max-width:800px; margin:2rem auto; padding:4rem 3rem; background:var(--surface); border-radius:30px; box-shadow:var(--shadow-lg); border:1px solid var(--border);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:3rem;">
+            <h2 style="margin:0; font-size:2.4rem; font-weight:800; color:var(--text-primary);">Privacy Policy</h2>
+            <button class="btn btn-secondary priv-back-btn" style="padding:10px 24px; border-radius:12px;">
+                <i class="fas fa-arrow-left"></i> Back to Home
+            </button>
+        </div>
+
+        <div style="line-height:1.8; color:var(--text-secondary); font-size:1.1rem; text-align:left;">
+            <p style="margin-bottom:2rem; font-weight:500;">At QuickPDF, we respect your privacy and are committed to
+                protecting your data.</p>
+
+            <h3 style="color:var(--text-primary); margin-top:2.5rem; font-size:1.4rem;">1. Data Collection</h3>
+            <p>We do not store your uploaded PDF files permanently. All files are processed temporarily and
+                automatically deleted after processing.</p>
+
+            <h3 style="color:var(--text-primary); margin-top:2.5rem; font-size:1.4rem;">2. Personal Information</h3>
+            <p>We do not require users to create an account or provide personal information to use our services.</p>
+
+            <h3 style="color:var(--text-primary); margin-top:2.5rem; font-size:1.4rem;">3. Cookies</h3>
+            <p>We may use basic cookies to improve user experience and website performance.</p>
+
+            <h3 style="color:var(--text-primary); margin-top:2.5rem; font-size:1.4rem;">4. Data Security</h3>
+            <p>We implement security measures to protect your data during processing.</p>
+
+            <h3 style="color:var(--text-primary); margin-top:2.5rem; font-size:1.4rem;">5. Third-Party Services</h3>
+            <p>Some features may rely on third-party tools, but we do not share your files with any third parties.</p>
+
+            <h3 style="color:var(--text-primary); margin-top:2.5rem; font-size:1.4rem;">6. Changes</h3>
+            <p>We may update this policy at any time. Continued use of the site means you accept any updates.</p>
+
+            <div style="margin-top:3rem; padding-top:2rem; border-top:1px solid var(--border);">
+                <p style="font-weight:700; color:var(--text-primary);">Contact:</p>
+                <p>quickpdf.contact@gmail.com</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION: Terms of Service -->
+    <div id="tos-section" class="tool-container"
+        style="max-width:800px; margin:2rem auto; padding:4rem 3rem; background:var(--surface); border-radius:30px; box-shadow:var(--shadow-lg); border:1px solid var(--border);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:3rem;">
+            <h2 style="margin:0; font-size:2.4rem; font-weight:800; color:var(--text-primary);">Terms of Service</h2>
+            <button class="btn btn-secondary" id="tos-back-btn" style="padding:10px 24px; border-radius:12px;">
+                <i class="fas fa-arrow-left"></i> Back to Home
+            </button>
+        </div>
+
+        <div style="line-height:1.8; color:var(--text-secondary); font-size:1.1rem; text-align:left;">
+            <p style="margin-bottom:2rem; font-weight:500;">By using QuickPDF, you agree to the following terms:</p>
+
+            <h3 style="color:var(--text-primary); margin-top:2.5rem; font-size:1.4rem;">1. Usage</h3>
+            <p>QuickPDF is a free tool designed to help users process and summarize PDF files.</p>
+
+            <h3 style="color:var(--text-primary); margin-top:2.5rem; font-size:1.4rem;">2. Responsibility</h3>
+            <p>Users are responsible for the content they upload. Do not upload illegal or sensitive documents.</p>
+
+            <h3 style="color:var(--text-primary); margin-top:2.5rem; font-size:1.4rem;">3. Availability</h3>
+            <p>We do not guarantee that the service will always be available or error-free.</p>
+
+            <h3 style="color:var(--text-primary); margin-top:2.5rem; font-size:1.4rem;">4. Limitation of Liability</h3>
+            <p>QuickPDF is not responsible for any loss, damage, or misuse of information.</p>
+
+            <h3 style="color:var(--text-primary); margin-top:2.5rem; font-size:1.4rem;">5. Modifications</h3>
+            <p>We may modify or discontinue the service at any time without notice.</p>
+
+            <h3 style="color:var(--text-primary); margin-top:2.5rem; font-size:1.4rem;">6. Acceptance</h3>
+            <p>By using this website, you agree to these terms.</p>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+    <script src="script.js"></script>
+</body>
+
+</html>
