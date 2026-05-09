@@ -4,7 +4,92 @@
    ========================================================= */
 
 document.addEventListener('DOMContentLoaded', () => {
+    /* ─── Translations Engine ─── */
+    const translations = {
+        en: {
+            app_subtitle: "Pro Document Intelligence Studio",
+            nav_extractor: "PDF Extractor",
+            nav_image: "Image to PDF",
+            nav_word: "Word to PDF",
+            nav_excel: "Excel to PDF",
+            nav_ppt: "PowerPoint to PDF",
+            nav_merge: "Merge PDF",
+            nav_edit: "Edit PDF",
+            nav_lock: "Lock PDF",
+            drop_zone_prompt: "Drop your file here",
+            drop_zone_subtext: "or click to browse",
+            extract_btn: "Extract Text Now",
+            privacy_msg: "We respect your privacy — your files are never stored.",
+            tos: "Terms of Service",
+            privacy_policy: "Privacy Policy",
+            back_home: "Back to Home"
+        },
+        ar: {
+            app_subtitle: "استوديو احترافي لذكاء المستندات",
+            nav_extractor: "مستخرج النصوص",
+            nav_image: "صور إلى PDF",
+            nav_word: "وورد إلى PDF",
+            nav_excel: "إكسيل إلى PDF",
+            nav_ppt: "بوربوينت إلى PDF",
+            nav_merge: "دمج الملفات",
+            nav_edit: "تعديل PDF",
+            nav_lock: "قفل الملف",
+            drop_zone_prompt: "ضع ملفك هنا",
+            drop_zone_subtext: "أو اضغط للتصفح",
+            extract_btn: "استخرج النص الآن",
+            privacy_msg: "نحن نحترم خصوصيتك — ملفاتك لا تُخزن أبداً.",
+            tos: "شروط الخدمة",
+            privacy_policy: "سياسة الخصوصية",
+            back_home: "العودة للرئيسية"
+        },
+        fr: {
+            app_subtitle: "Studio Pro d'Intelligence Documentaire",
+            nav_extractor: "Extracteur PDF",
+            nav_image: "Image en PDF",
+            nav_word: "Word en PDF",
+            nav_excel: "Excel en PDF",
+            nav_ppt: "PPT en PDF",
+            nav_merge: "Fusionner PDF",
+            nav_edit: "Modifier PDF",
+            nav_lock: "Verrouiller PDF",
+            drop_zone_prompt: "Déposez votre fichier ici",
+            drop_zone_subtext: "ou cliquez pour parcourir",
+            extract_btn: "Extraire le texte maintenant",
+            privacy_msg: "Respect de la vie privée — vos fichiers ne sont jamais stockés.",
+            tos: "Conditions d'Utilisation",
+            privacy_policy: "Politique de Confidentialité",
+            back_home: "Retour à l'accueil"
+        }
+    };
 
+    function updateLanguage(lang) {
+        document.documentElement.dir = (lang === 'ar') ? 'rtl' : 'ltr';
+        
+        // Update elements with data-i18n attribute
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            if (translations[lang][key]) {
+                el.innerText = translations[lang][key];
+            }
+        });
+
+        // Specific overrides if needed
+        const appHeaderP = document.querySelector('.app-header p');
+        if (appHeaderP) appHeaderP.innerText = translations[lang].app_subtitle;
+    }
+
+    const langSelect = document.getElementById('lang-select');
+    langSelect?.addEventListener('change', (e) => {
+        updateLanguage(e.target.value);
+        localStorage.setItem('quickpdf-lang', e.target.value);
+    });
+
+    // Load saved language
+    const savedLang = localStorage.getItem('quickpdf-lang') || 'en';
+    if (langSelect) langSelect.value = savedLang;
+    updateLanguage(savedLang);
+
+    /* ─── UI & State Management ─── */
     const toast = document.getElementById('toast');
 
     /* ─── Utility: Theme Toggle ─── */

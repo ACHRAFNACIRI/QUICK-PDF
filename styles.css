@@ -16,6 +16,35 @@
     --radius: 16px;
 }
 
+/* Language Switcher Styles */
+.lang-switcher {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface);
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    color: var(--text-secondary);
+}
+
+.lang-switcher select {
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600;
+    font-size: 0.9rem;
+    outline: none;
+    cursor: pointer;
+}
+
+.lang-switcher i {
+    font-size: 1rem;
+    color: var(--primary);
+}
+
 body.dark-mode {
     --bg: #0f172a;
     --surface: #1e293b;
@@ -36,13 +65,17 @@ body {
     background: var(--bg);
     color: var(--text-primary);
     min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    transition: background 0.3s ease;
 }
 
-/* ─── Container ─── */
 .container {
-    max-width: 1100px;
+    flex: 1;
+    width: 100%;
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 3rem 2rem;
+    padding: 3rem 1.5rem;
 }
 
 /* ─── Header ─── */
@@ -1144,6 +1177,39 @@ body.dark-mode .drop-zone:hover {
     padding: 0.4rem 0.8rem;
     border-radius: 12px;
     border: 1px solid rgba(255,255,255,0.15);
+}
+
+/* ─── Responsive Adjustments ─── */
+@media (max-width: 768px) {
+    .footer-container {
+        flex-direction: column !important;
+        text-align: center !important;
+        gap: 2rem !important;
+    }
+
+    .footer-brand-info {
+        text-align: center !important;
+        width: 100% !important;
+    }
+
+    .privacy-note {
+        justify-content: center !important;
+        margin-top: 8px !important;
+    }
+
+    .footer-actions {
+        align-items: center !important;
+        width: 100% !important;
+    }
+
+    .footer-legal-links {
+        justify-content: center !important;
+        width: 100% !important;
+    }
+    
+    .main-footer {
+        padding: 3rem 1.5rem !important;
+    }
 }
 
 @keyframes fadeIn {
