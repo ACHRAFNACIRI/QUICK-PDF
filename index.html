@@ -492,103 +492,44 @@
             style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(15, 23, 42, 0.95);z-index:9999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(12px);">
             <div
                 style="background:#f8fafc; width:98%; max-width:1280px; height:95vh; border-radius:24px; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 50px 100px rgba(0,0,0,0.5); border:1px solid rgba(255,255,255,0.1);">
-
                 <!-- Modal Header / Toolbar -->
-                <div
-                    style="padding:0.75rem 1.5rem; background:#0f172a; color:white; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #1e293b;">
-                    <div style="display:flex; align-items:center; gap:1.25rem;">
-                        <div style="display:flex; flex-direction:column;">
-                            <span style="font-size:0.85rem; font-weight:800; letter-spacing:0.02em; color:#6366f1;">PDF
-                                EDITOR</span>
-                            <span style="font-size:0.7rem; color:#94a3b8; font-weight:600;">Page <span
-                                    id="modal-page-num">1</span></span>
-                        </div>
-
-                        <div style="width:1px; height:32px; background:#334155;"></div>
-
-                        <!-- Toolset: Zoom -->
-                        <div
-                            style="display:flex; align-items:center; gap:0.5rem; background:rgba(255,255,255,0.05); padding:6px; border-radius:16px;">
-                            <button id="anno-zoom-out" class="btn btn-secondary btn-sm" title="Zoom Out"
-                                style="background:transparent; border:none; padding:8px;"><i
-                                    class="fas fa-search-minus"></i></button>
-                            <span id="anno-zoom-val"
-                                style="font-size:0.75rem; font-weight:700; width:40px; text-align:center; color:#94a3b8;">100%</span>
-                            <button id="anno-zoom-in" class="btn btn-secondary btn-sm" title="Zoom In"
-                                style="background:transparent; border:none; padding:8px;"><i
-                                    class="fas fa-search-plus"></i></button>
-                        </div>
-
-                        <div style="width:1px; height:32px; background:#334155;"></div>
-
-                        <!-- Toolset: Add items -->
-                        <div
-                            style="display:flex; align-items:center; gap:0.75rem; background:rgba(255,255,255,0.05); padding:6px; border-radius:16px;">
-                            <button id="anno-add-text" class="btn"
-                                style="background:#6366f1; color:white; border:none; padding:8px 16px; border-radius:12px; font-weight:700; display:flex; align-items:center; gap:8px; transition:0.2s;">
-                                <i class="fas fa-font" style="font-size:1.1rem;"></i> <span>Add Text</span>
-                            </button>
-                            <button id="anno-add-rect" class="btn" title="Add Rectangle"
-                                style="background:#ec4899; color:white; border:none; padding:8px 12px; border-radius:10px; transition:0.2s;">
-                                <i class="fas fa-square" style="font-size:1rem;"></i>
-                            </button>
-                            <button id="anno-add-circle" class="btn" title="Add Circle"
-                                style="background:#8b5cf6; color:white; border:none; padding:8px 12px; border-radius:10px; transition:0.2s;">
-                                <i class="fas fa-circle" style="font-size:1rem;"></i>
-                            </button>
-                            <button id="anno-add-line" class="btn" title="Add Line"
-                                style="background:#10b981; color:white; border:none; padding:8px 12px; border-radius:10px; transition:0.2s;">
-                                <i class="fas fa-slash" style="font-size:1rem;"></i>
-                            </button>
-                            <button id="anno-add-image" class="btn" title="Add Photo"
-                                style="background:#f59e0b; color:white; border:none; padding:8px 12px; border-radius:10px; transition:0.2s;">
-                                <i class="fas fa-image" style="font-size:1rem;"></i>
-                            </button>
-                            <input type="file" id="anno-image-input" accept="image/*" class="hidden">
-                        </div>
-
-                        <!-- Toolset: Styling -->
-                        <div class="anno-control-panel"
-                            style="background:#1e293b; padding:4px 12px; border-radius:12px; height:40px;">
-                            <!-- Color -->
-                            <div style="display:flex; align-items:center; gap:8px;">
-                                <input type="color" id="anno-color" value="#6366f1" title="Pick Color"
-                                    style="width:28px; height:28px; border:none; border-radius:6px; cursor:pointer; background:none;">
-                            </div>
-                            <div style="width:1px; height:20px; background:#334155; margin:0 8px;"></div>
-                            <!-- Font Size -->
-                            <div style="display:flex; align-items:center; gap:8px; color:#94a3b8;">
-                                <i class="fas fa-text-height" style="font-size:0.8rem;"></i>
-                                <select id="anno-font-size"
-                                    style="background:transparent; border:none; color:white; font-size:0.85rem; font-weight:600; cursor:pointer; outline:none;">
-                                    <option value="12">12</option>
-                                    <option value="16">16</option>
-                                    <option value="20">20</option>
-                                    <option value="24" selected>24</option>
-                                    <option value="32">32</option>
-                                    <option value="48">48</option>
-                                </select>
-                            </div>
-                            <div style="width:1px; height:20px; background:#334155; margin:0 8px;"></div>
-                            <!-- Border -->
-                            <div style="display:flex; align-items:center; gap:8px; color:#94a3b8;">
-                                <i class="fas fa-minus" style="font-size:0.8rem;"></i>
-                                <input type="range" id="anno-border" min="1" max="10" step="1" value="2"
-                                    title="Border Width" style="width:50px; cursor:pointer; accent-color:#6366f1;">
-                            </div>
+                <div class="anno-modal-header">
+                    <div class="anno-header-left">
+                        <span class="modal-title">Page <span id="modal-page-num">1</span></span>
+                        <div class="anno-zoom-controls">
+                            <button id="anno-zoom-out"><i class="fas fa-search-minus"></i></button>
+                            <span id="anno-zoom-val">100%</span>
+                            <button id="anno-zoom-in"><i class="fas fa-search-plus"></i></button>
                         </div>
                     </div>
 
-                    <div style="display:flex; align-items:center; gap:1rem;">
-                        <button id="anno-save" class="btn btn-primary"
-                            style="padding:0.6rem 1.5rem; font-size:0.85rem;">
-                            <i class="fas fa-check-circle" style="margin-right:6px;"></i> Apply Changes
-                        </button>
-                        <button id="anno-close"
-                            style="background:none; border:none; color:#94a3b8; cursor:pointer; font-size:1.2rem; transition:0.2s;"
-                            onmouseover="this.style.color='white'" onmouseout="this.style.color='#94a3b8'">
-                            <i class="fas fa-times"></i>
-                        </button>
+                    <div class="anno-tools-center">
+                        <div class="tool-group">
+                            <button id="anno-add-text" class="tool-btn text-tool" title="Add Text"><i class="fas fa-font"></i></button>
+                            <button id="anno-add-rect" class="tool-btn rect-tool" title="Add Square"><i class="fas fa-square"></i></button>
+                            <button id="anno-add-circle" class="tool-btn circle-tool" title="Add Circle"><i class="fas fa-circle"></i></button>
+                            <button id="anno-add-line" class="tool-btn line-tool" title="Add Line"><i class="fas fa-slash"></i></button>
+                            <button id="anno-add-image" class="tool-btn image-tool" title="Add Photo"><i class="fas fa-image"></i></button>
+                            <input type="file" id="anno-image-input" accept="image/*" class="hidden">
+                        </div>
+
+                        <div class="style-group">
+                            <input type="color" id="anno-color" value="#6366f1" title="Color">
+                            <select id="anno-font-size" title="Font Size">
+                                <option value="12">12</option>
+                                <option value="16">16</option>
+                                <option value="20">20</option>
+                                <option value="24" selected>24</option>
+                                <option value="32">32</option>
+                                <option value="48">48</option>
+                            </select>
+                            <input type="range" id="anno-border" min="1" max="10" step="1" value="2" title="Border">
+                        </div>
+                    </div>
+
+                    <div class="anno-header-right">
+                        <button id="anno-save" class="btn btn-primary"><i class="fas fa-check-circle"></i> Apply</button>
+                        <button id="anno-close" class="close-btn"><i class="fas fa-times"></i></button>
                     </div>
                 </div>
 

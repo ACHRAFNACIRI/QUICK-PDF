@@ -1179,36 +1179,244 @@ body.dark-mode .drop-zone:hover {
     border: 1px solid rgba(255,255,255,0.15);
 }
 
-/* ─── Responsive Adjustments ─── */
+/* ─── Annotation Modal Header ─── */
+.anno-modal-header {
+    background: #0f172a;
+    padding: 0.75rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #1e293b;
+    z-index: 120;
+}
+
+.anno-header-left {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.modal-title {
+    color: white;
+    font-weight: 800;
+    font-size: 1rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.anno-zoom-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: #1e293b;
+    padding: 6px 12px;
+    border-radius: 12px;
+    border: 1px solid #334155;
+}
+
+.anno-zoom-controls button {
+    background: none;
+    border: none;
+    color: #94a3b8;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.anno-zoom-controls button:hover { color: white; }
+
+.anno-tools-center {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.tool-group, .style-group {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: rgba(255,255,255,0.05);
+    padding: 6px;
+    border-radius: 14px;
+}
+
+.tool-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    border: none;
+    color: white;
+    cursor: pointer;
+    transition: 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.text-tool { background: #6366f1; }
+.rect-tool { background: #ec4899; }
+.circle-tool { background: #8b5cf6; }
+.line-tool { background: #10b981; }
+.image-tool { background: #f59e0b; }
+
+.tool-btn:hover { transform: translateY(-2px); filter: brightness(1.1); }
+
+.style-group input[type="color"] {
+    width: 30px;
+    height: 30px;
+    border: none;
+    background: none;
+    cursor: pointer;
+}
+
+.style-group select {
+    background: transparent;
+    border: none;
+    color: white;
+    font-weight: 700;
+    outline: none;
+}
+
+.anno-header-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    color: #94a3b8;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+/* ─── Mobile Overhaul (768px and below) ─── */
 @media (max-width: 768px) {
-    .footer-container {
-        flex-direction: column !important;
-        text-align: center !important;
-        gap: 2rem !important;
+    .container {
+        padding: 1.5rem 1rem !important;
     }
 
-    .footer-brand-info {
-        text-align: center !important;
-        width: 100% !important;
+    .app-header {
+        padding-bottom: 2rem !important;
+        gap: 0.8rem !important;
     }
 
-    .privacy-note {
-        justify-content: center !important;
-        margin-top: 8px !important;
+    .app-header > div:first-child {
+        position: static !important;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
     }
 
-    .footer-actions {
-        align-items: center !important;
-        width: 100% !important;
-    }
+    .app-header h1 { font-size: 1.8rem !important; text-align: center; }
+    .app-header p { font-size: 0.85rem !important; text-align: center; }
 
-    .footer-legal-links {
-        justify-content: center !important;
-        width: 100% !important;
+    .tool-nav {
+        overflow-x: auto;
+        justify-content: flex-start !important;
+        padding: 8px !important;
+        width: calc(100% + 2rem);
+        margin: 0 -1rem;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
     }
     
-    .main-footer {
-        padding: 3rem 1.5rem !important;
+    .nav-btn {
+        flex-shrink: 0;
+        padding: 10px 16px !important;
+        font-size: 0.85rem !important;
+    }
+
+    .anno-modal-header {
+        flex-direction: column;
+        padding: 0.5rem;
+        gap: 0.75rem;
+    }
+
+    .anno-header-left {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .anno-tools-center {
+        width: 100%;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .tool-group, .style-group {
+        width: 100%;
+        justify-content: center;
+        padding: 4px;
+    }
+
+    .anno-header-right {
+        width: 100%;
+        justify-content: center;
+        padding-top: 5px;
+        border-top: 1px solid #1e293b;
+    }
+
+    #anno-save {
+        width: 100%;
+        padding: 0.8rem !important;
+    }
+
+    .footer-container {
+        flex-direction: column !important;
+        gap: 1.5rem !important;
+    }
+}
+
+    .modal-header {
+        padding: 0.75rem !important;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        justify-content: center !important;
+    }
+
+    .anno-control-panel {
+        flex-wrap: wrap !important;
+        justify-content: center !important;
+        gap: 0.5rem !important;
+        width: 100% !important;
+        background: rgba(255,255,255,0.05) !important;
+        padding: 0.6rem !important;
+    }
+
+    .anno-control-panel > * {
+        font-size: 0.8rem !important;
+    }
+
+    #anno-canvas-wrapper {
+        transform: scale(0.9) !important;
+        max-width: 95vw !important;
+    }
+
+    .modal-footer {
+        padding: 1rem !important;
+        flex-direction: column;
+        gap: 0.8rem;
+    }
+}
+
+/* Extra small devices */
+@media (max-width: 480px) {
+    .app-header h1 {
+        font-size: 1.6rem !important;
+    }
+
+    .nav-btn span {
+        display: none; /* Icons only for clean look on tiny screens */
+    }
+    
+    .nav-btn {
+        width: 44px;
+        height: 44px;
+        justify-content: center;
+        padding: 0 !important;
     }
 }
 
