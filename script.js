@@ -955,7 +955,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function createAnnoEl(data) {
         const el = document.createElement('div');
         el.dataset.type = data.type;
-        el.dataset.opacity = data.opacity || 1;
+        el.dataset.opacity = 1;
         el.dataset.borderWidth = data.borderWidth || 2;
         el.dataset.color = data.color || '#6366f1';
         el.dataset.src = data.src || '';
@@ -997,7 +997,7 @@ document.addEventListener('DOMContentLoaded', () => {
             el.style.overflow  = 'hidden';
             el.style.outline   = 'none';
         } else if (data.type !== 'line' && data.type !== 'image' && data.type !== 'circle' && data.type !== 'rect') {
-            el.style.background = hexToRgba(el.dataset.color, el.dataset.opacity);
+            el.style.background = hexToRgba(el.dataset.color, 1);
         }
 
         /* Drag logic */
@@ -1105,7 +1105,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 color: el.dataset.color,
                 fontSize: parseInt(el.style.fontSize) || 24,
                 text: el.innerText || '',
-                opacity: parseFloat(el.dataset.opacity) || 1,
+                opacity: 1,
                 borderWidth: parseInt(el.dataset.borderWidth) || 2,
                 src: el.dataset.src || ''
             });
@@ -1152,7 +1152,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             width: pdfW,
                             height: pdfH,
                             color: rgb(col.r, col.g, col.b),
-                            opacity: a.opacity || 0.4,
+                            opacity: 1,
                             borderWidth: a.borderWidth || 2,
                             borderColor: rgb(col.r, col.g, col.b)
                         });
@@ -1163,7 +1163,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             xRadius: pdfW / 2,
                             yRadius: pdfH / 2,
                             color: rgb(col.r, col.g, col.b),
-                            opacity: a.opacity || 0.4,
+                            opacity: 1,
                             borderWidth: a.borderWidth || 2,
                             borderColor: rgb(col.r, col.g, col.b)
                         });
@@ -1222,20 +1222,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    /* ─── Color Helpers ─── */
-    function hexToRgba(hex, alpha) {
-        const r = parseInt(hex.slice(1,3), 16);
-        const g = parseInt(hex.slice(3,5), 16);
-        const b = parseInt(hex.slice(5,7), 16);
-        return `rgba(${r},${g},${b},${alpha})`;
-    }
-    function hexToRgbFloat(hex) {
-        return {
-            r: parseInt(hex.slice(1,3), 16) / 255,
-            g: parseInt(hex.slice(3,5), 16) / 255,
-            b: parseInt(hex.slice(5,7), 16) / 255
-        };
-    }
+    /* Helpers already defined at end of file */
 
     /* ════════════════════════════════════════════
        TOOL 8 · Lock PDF (Password Protect)
