@@ -911,7 +911,7 @@ document.addEventListener('DOMContentLoaded', () => {
         annoOverlays.appendChild(createAnnoEl({
             type: 'rect', x: 20, y: 20, w: 20, h: 15, 
             color: document.getElementById('anno-color').value,
-            opacity: parseFloat(document.getElementById('anno-opacity').value) || 0.4,
+            opacity: 1,
             borderWidth: parseInt(document.getElementById('anno-border').value) || 2
         }));
     });
@@ -920,7 +920,7 @@ document.addEventListener('DOMContentLoaded', () => {
         annoOverlays.appendChild(createAnnoEl({
             type: 'circle', x: 25, y: 25, w: 15, h: 15, 
             color: document.getElementById('anno-color').value,
-            opacity: parseFloat(document.getElementById('anno-opacity').value) || 0.4,
+            opacity: 1,
             borderWidth: parseInt(document.getElementById('anno-border').value) || 2
         }));
     });
