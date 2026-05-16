@@ -22,7 +22,8 @@ document.addEventListener('DOMContentLoaded', () => {
             privacy_msg: "We respect your privacy — your files are never stored.",
             tos: "Terms of Service",
             privacy_policy: "Privacy Policy",
-            back_home: "Back to Home"
+            back_home: "Back to Home",
+            nav_number: "Number Pages"
         },
         ar: {
             app_subtitle: "استوديو احترافي لذكاء المستندات",
@@ -40,7 +41,8 @@ document.addEventListener('DOMContentLoaded', () => {
             privacy_msg: "نحن نحترم خصوصيتك — ملفاتك لا تُخزن أبداً.",
             tos: "شروط الخدمة",
             privacy_policy: "سياسة الخصوصية",
-            back_home: "العودة للرئيسية"
+            back_home: "العودة للرئيسية",
+            nav_number: "ترقيم الصفحات"
         },
         fr: {
             app_subtitle: "Studio Pro d'Intelligence Documentaire",
@@ -58,7 +60,8 @@ document.addEventListener('DOMContentLoaded', () => {
             privacy_msg: "Respect de la vie privée — vos fichiers ne sont jamais stockés.",
             tos: "Conditions d'Utilisation",
             privacy_policy: "Politique de Confidentialité",
-            back_home: "Retour à l'accueil"
+            back_home: "Retour à l'accueil",
+            nav_number: "Numéroter les pages"
         }
     };
 
@@ -1308,6 +1311,102 @@ document.addEventListener('DOMContentLoaded', () => {
             lockLoader.classList.add('hidden');
             lockForm.classList.remove('hidden');
             showToast('Error encrypting PDF. Try another file.', true);
+        }
+    });
+
+    /* ════════════════════════════════════════════
+       TOOL 9 · Page Numbering
+    ════════════════════════════════════════════ */
+    let numberBuffer = null;
+    const numberOptions = document.getElementById('number-options');
+    const numberLoader = document.getElementById('number-loader');
+    const numberDownloadBanner = document.getElementById('number-download-banner');
+    const numberDownloadBtn = document.getElementById('number-download-btn');
+    const startNumberBtn = document.getElementById('start-number-btn');
+
+    setupDropZone('number-drop-zone', 'numberFile', files => {
+        if (files[0]) {
+            numberBuffer = null;
+            showFileCard('number-file-card', files[0], 'accent-green', 'fas fa-list-ol', () => {
+                document.getElementById('numberFile').value = '';
+                numberOptions.classList.add('hidden');
+                numberDownloadBanner.classList.add('hidden');
+                numberBuffer = null;
+            });
+            numberOptions.classList.remove('hidden');
+            numberDownloadBanner.classList.add('hidden');
+
+            const reader = new FileReader();
+            reader.onload = e => { numberBuffer = e.target.result; };
+            reader.readAsArrayBuffer(files[0]);
+        }
+    });
+
+    startNumberBtn?.addEventListener('click', async () => {
+        if (!numberBuffer) return showToast('Please select a PDF file.', true);
+
+        const pos = document.getElementById('number-pos').value;
+        const format = document.getElementById('number-format').value;
+        const startPage = parseInt(document.getElementById('number-start').value) || 1;
+
+        updateFileCardStatus('number-file-card', 'Processing...');
+        numberLoader.classList.remove('hidden');
+        numberOptions.classList.add('hidden');
+        numberDownloadBanner.classList.add('hidden');
+
+        try {
+            const { PDFDocument, rgb, StandardFonts } = PDFLib;
+            const pdfDoc = await PDFDocument.load(numberBuffer.slice(0));
+            const pages = pdfDoc.getPages();
+            const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+            const totalPages = pages.length;
+
+            for (let i = 0; i < totalPages; i++) {
+                const page = pages[i];
+                const { width, height } = page.getSize();
+                const pageNum = startPage + i;
+                
+                let text = '';
+                if (format === 'simple') text = `${pageNum}`;
+                else if (format === 'page-n') text = `Page ${pageNum}`;
+                else if (format === 'n-of-m') text = `Page ${pageNum} of ${totalPages}`;
+                else if (format === 'dash') text = `- ${pageNum} -`;
+
+                const fontSize = 12;
+                const textWidth = font.widthOfTextAtSize(text, fontSize);
+                const margin = 30;
+
+                let x, y;
+                // Vertical
+                if (pos.startsWith('bottom')) y = margin;
+                else y = height - margin;
+
+                // Horizontal
+                if (pos.endsWith('left')) x = margin;
+                else if (pos.endsWith('right')) x = width - textWidth - margin;
+                else x = (width / 2) - (textWidth / 2);
+
+                page.drawText(text, {
+                    x, y,
+                    size: fontSize,
+                    font,
+                    color: rgb(0.4, 0.4, 0.4)
+                });
+            }
+
+            const bytes = await pdfDoc.save();
+            const blob = new Blob([bytes], { type: 'application/pdf' });
+            numberDownloadBtn.href = URL.createObjectURL(blob);
+            
+            updateFileCardStatus('number-file-card', 'Completed');
+            numberLoader.classList.add('hidden');
+            numberDownloadBanner.classList.remove('hidden');
+            showToast('✅ Page numbering applied!');
+        } catch (err) {
+            console.error(err);
+            numberLoader.classList.add('hidden');
+            numberOptions.classList.remove('hidden');
+            showToast('Error applying page numbers.', true);
         }
     });
 

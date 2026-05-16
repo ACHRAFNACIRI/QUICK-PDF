@@ -94,6 +94,9 @@
             <button class="nav-btn lock-btn" data-tool="lock-tool">
                 <i class="fas fa-lock"></i> <span data-i18n="nav_lock">Lock PDF</span>
             </button>
+            <button class="nav-btn number-btn" data-tool="number-tool">
+                <i class="fas fa-list-ol"></i> <span data-i18n="nav_number">Number Pages</span>
+            </button>
         </nav>
 
         <!-- ═══════════════════════════════════ -->
@@ -483,6 +486,68 @@
                 <a id="lock-download-btn" class="btn" style="background:#f59e0b;color:white;" href="#"
                     download="locked.pdf">
                     <i class="fas fa-download"></i> Download Locked PDF
+                </a>
+            </div>
+        </div>
+        
+        <!-- ═══════════════════════════════════ -->
+        <!-- TOOL 9 · Page Numbering            -->
+        <!-- ═══════════════════════════════════ -->
+        <div id="number-tool" class="tool-container">
+            <div class="drop-zone" id="number-drop-zone">
+                <div class="drop-zone__icon"><i class="fas fa-list-ol" style="color:#10b981;"></i></div>
+                <span class="drop-zone__prompt">Drop PDF to Add Page Numbers</span>
+                <span class="drop-zone__subtext">Professional numbering for reports and documents</span>
+                <input type="file" id="numberFile" accept=".pdf" hidden>
+            </div>
+            <div class="file-card-wrapper" id="number-file-card"></div>
+            
+            <div id="number-options" class="hidden" style="margin-top:2rem; background:white; border-radius:24px; padding:2rem; box-shadow:var(--shadow-lg); border:1px solid var(--border); max-width:600px; margin-left:auto; margin-right:auto;">
+                <h3 style="margin-bottom:1.5rem; text-align:center;"><i class="fas fa-cog" style="color:#10b981;"></i> Numbering Settings</h3>
+                
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-bottom:1.5rem;">
+                    <div>
+                        <label style="display:block; font-weight:600; margin-bottom:0.5rem; font-size:0.9rem;">Position</label>
+                        <select id="number-pos" style="width:100%; padding:0.8rem; border-radius:12px; border:2px solid #e2e8f0; font-family:inherit; outline:none;">
+                            <option value="bottom-center">Bottom Center</option>
+                            <option value="bottom-right">Bottom Right</option>
+                            <option value="bottom-left">Bottom Left</option>
+                            <option value="top-center">Top Center</option>
+                            <option value="top-right">Top Right</option>
+                            <option value="top-left">Top Left</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display:block; font-weight:600; margin-bottom:0.5rem; font-size:0.9rem;">Format</label>
+                        <select id="number-format" style="width:100%; padding:0.8rem; border-radius:12px; border:2px solid #e2e8f0; font-family:inherit; outline:none;">
+                            <option value="simple">{n}</option>
+                            <option value="page-n">Page {n}</option>
+                            <option value="n-of-m">Page {n} of {m}</option>
+                            <option value="dash">- {n} -</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="margin-bottom:2rem;">
+                    <label style="display:block; font-weight:600; margin-bottom:0.5rem; font-size:0.9rem;">Start numbering from page:</label>
+                    <input type="number" id="number-start" value="1" min="1" style="width:100%; padding:0.8rem; border-radius:12px; border:2px solid #e2e8f0; font-family:inherit; outline:none;">
+                </div>
+
+                <button id="start-number-btn" class="btn btn-primary" style="width:100%; justify-content:center; padding:1rem; font-size:1rem; background:#10b981;">
+                    <i class="fas fa-check-circle"></i> Apply Page Numbers
+                </button>
+            </div>
+
+            <div id="number-loader" class="loader-wrapper hidden">
+                <div class="loader" style="border-top-color:#10b981;"></div>
+                <p>Applying page numbers…</p>
+            </div>
+
+            <div id="number-download-banner" class="download-banner hidden" style="background:linear-gradient(135deg,#ecfdf5,#d1fae5); border-color:#6ee7b7;">
+                <h3><i class="fas fa-check-circle"></i> Success!</h3>
+                <p>Your PDF has been numbered successfully.</p>
+                <a id="number-download-btn" class="btn btn-success" href="#" download="numbered.pdf">
+                    <i class="fas fa-download"></i> Download Numbered PDF
                 </a>
             </div>
         </div>
