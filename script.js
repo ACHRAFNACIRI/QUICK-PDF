@@ -23,7 +23,8 @@ document.addEventListener('DOMContentLoaded', () => {
             tos: "Terms of Service",
             privacy_policy: "Privacy Policy",
             back_home: "Back to Home",
-            nav_number: "Number Pages"
+            nav_number: "Number Pages",
+            nav_dashboard: "All Tools"
         },
         ar: {
             app_subtitle: "استوديو احترافي لذكاء المستندات",
@@ -42,7 +43,8 @@ document.addEventListener('DOMContentLoaded', () => {
             tos: "شروط الخدمة",
             privacy_policy: "سياسة الخصوصية",
             back_home: "العودة للرئيسية",
-            nav_number: "ترقيم الصفحات"
+            nav_number: "ترقيم الصفحات",
+            nav_dashboard: "كل الأدوات"
         },
         fr: {
             app_subtitle: "Studio Pro d'Intelligence Documentaire",
@@ -61,7 +63,8 @@ document.addEventListener('DOMContentLoaded', () => {
             tos: "Conditions d'Utilisation",
             privacy_policy: "Politique de Confidentialité",
             back_home: "Retour à l'accueil",
-            nav_number: "Numéroter les pages"
+            nav_number: "Numéroter les pages",
+            nav_dashboard: "Tous les outils"
         }
     };
 
@@ -298,12 +301,23 @@ document.addEventListener('DOMContentLoaded', () => {
     /* ─── Navigation ─── */
     const navBtns = document.querySelectorAll('.nav-btn');
     const toolPanels = document.querySelectorAll('.tool-container');
+    
+    function switchTool(toolId) {
+        navBtns.forEach(b => b.classList.toggle('active', b.dataset.tool === toolId));
+        toolPanels.forEach(p => p.classList.toggle('active', p.id === toolId));
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
     navBtns.forEach(btn => {
         btn.addEventListener('click', () => {
-            navBtns.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            const target = btn.dataset.tool;
-            toolPanels.forEach(p => p.classList.toggle('active', p.id === target));
+            switchTool(btn.dataset.tool);
+        });
+    });
+
+    // Dashboard card clicks
+    document.querySelectorAll('.tool-card').forEach(card => {
+        card.addEventListener('click', () => {
+            switchTool(card.dataset.tool);
         });
     });
 

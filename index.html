@@ -70,7 +70,10 @@
         </header>
 
         <nav class="tool-nav">
-            <button class="nav-btn extractor-btn active" data-tool="extractor-tool">
+            <button class="nav-btn dashboard-btn active" data-tool="dashboard-tool">
+                <i class="fas fa-th-large"></i> <span data-i18n="nav_dashboard">All Tools</span>
+            </button>
+            <button class="nav-btn extractor-btn" data-tool="extractor-tool">
                 <i class="fas fa-file-export"></i> <span data-i18n="nav_extractor">PDF Extractor</span>
             </button>
             <button class="nav-btn image-btn" data-tool="image-tool">
@@ -100,9 +103,89 @@
         </nav>
 
         <!-- ═══════════════════════════════════ -->
+        <!-- TOOL 0 · Dashboard (Home)          -->
+        <!-- ═══════════════════════════════════ -->
+        <div id="dashboard-tool" class="tool-container active">
+            <div class="dashboard-grid">
+                <!-- Card 1 -->
+                <div class="tool-card" data-tool="extractor-tool">
+                    <div class="tool-card__icon" style="background:rgba(99,102,241,0.1); color:#6366f1;">
+                        <i class="fas fa-file-export"></i>
+                    </div>
+                    <h3 data-i18n="nav_extractor">PDF Extractor</h3>
+                    <p>Extract text from any PDF instantly using our high-precision engine.</p>
+                </div>
+                <!-- Card 2 -->
+                <div class="tool-card" data-tool="image-tool">
+                    <div class="tool-card__icon" style="background:rgba(236,72,153,0.1); color:#ec4899;">
+                        <i class="fas fa-image"></i>
+                    </div>
+                    <h3 data-i18n="nav_image">Image to PDF</h3>
+                    <p>Convert JPG, PNG, WEBP images into professional PDF documents.</p>
+                </div>
+                <!-- Card 3 -->
+                <div class="tool-card" data-tool="word-tool">
+                    <div class="tool-card__icon" style="background:rgba(43,87,154,0.1); color:#2b579a;">
+                        <i class="fas fa-file-word"></i>
+                    </div>
+                    <h3 data-i18n="nav_word">Word to PDF</h3>
+                    <p>Turn your Word documents (.docx) into clean, shareable PDFs.</p>
+                </div>
+                <!-- Card 4 -->
+                <div class="tool-card" data-tool="excel-tool">
+                    <div class="tool-card__icon" style="background:rgba(33,115,70,0.1); color:#217346;">
+                        <i class="fas fa-file-excel"></i>
+                    </div>
+                    <h3 data-i18n="nav_excel">Excel to PDF</h3>
+                    <p>Transform spreadsheets into perfectly formatted PDF reports.</p>
+                </div>
+                <!-- Card 5 -->
+                <div class="tool-card" data-tool="ppt-tool">
+                    <div class="tool-card__icon" style="background:rgba(183,71,42,0.1); color:#b7472a;">
+                        <i class="fas fa-file-powerpoint"></i>
+                    </div>
+                    <h3 data-i18n="nav_ppt">PowerPoint to PDF</h3>
+                    <p>Convert your presentations into high-quality PDF slides.</p>
+                </div>
+                <!-- Card 6 -->
+                <div class="tool-card" data-tool="merge-tool">
+                    <div class="tool-card__icon" style="background:rgba(139,92,246,0.1); color:#8b5cf6;">
+                        <i class="fas fa-object-group"></i>
+                    </div>
+                    <h3 data-i18n="nav_merge">Merge PDF</h3>
+                    <p>Combine multiple PDF files into one organized document.</p>
+                </div>
+                <!-- Card 7 -->
+                <div class="tool-card" data-tool="edit-tool">
+                    <div class="tool-card__icon" style="background:rgba(225,29,72,0.1); color:#e11d48;">
+                        <i class="fas fa-edit"></i>
+                    </div>
+                    <h3 data-i18n="nav_edit">Edit PDF</h3>
+                    <p>Rotate, delete, or annotate pages visually in our editor studio.</p>
+                </div>
+                <!-- Card 8 -->
+                <div class="tool-card" data-tool="lock-tool">
+                    <div class="tool-card__icon" style="background:rgba(245,158,11,0.1); color:#f59e0b;">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <h3 data-i18n="nav_lock">Lock PDF</h3>
+                    <p>Protect your sensitive documents with AES-256 encryption.</p>
+                </div>
+                <!-- Card 9 -->
+                <div class="tool-card" data-tool="number-tool">
+                    <div class="tool-card__icon" style="background:rgba(16,185,129,0.1); color:#10b981;">
+                        <i class="fas fa-list-ol"></i>
+                    </div>
+                    <h3 data-i18n="nav_number">Number Pages</h3>
+                    <p>Add professional page numbering to your PDF reports.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════ -->
         <!-- TOOL 1 · PDF Extractor             -->
         <!-- ═══════════════════════════════════ -->
-        <div id="extractor-tool" class="tool-container active">
+        <div id="extractor-tool" class="tool-container">
             <div class="drop-zone" id="extract-drop-zone">
                 <div class="drop-zone__icon"><i class="fas fa-file-pdf" style="color:#6366f1;"></i></div>
                 <span class="drop-zone__prompt" data-i18n="drop_zone_prompt">Drop your PDF file here</span>
