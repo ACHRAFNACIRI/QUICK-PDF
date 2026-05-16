@@ -183,28 +183,38 @@ document.addEventListener('DOMContentLoaded', () => {
         return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
     }
 
+    const MAX_FILES = 15;
+
     /* ─── Utility: Show file preview card ─── */
-    function showFileCard(wrapperId, file, accent, iconClass, onRemove) {
+    function showFileCard(wrapperId, files, accent, iconClass, onRemove) {
         const wrapper = document.getElementById(wrapperId);
         if (!wrapper) return;
-        const ext = file.name.split('.').pop().toUpperCase();
+        
+        const fileList = Array.isArray(files) ? files : [files];
+        const isMultiple = fileList.length > 1;
+        const mainFile = fileList[0];
+        const ext = mainFile.name.split('.').pop().toUpperCase();
+        
+        const displayName = isMultiple ? `${fileList.length} files selected` : mainFile.name;
+        const totalSize = fileList.reduce((acc, f) => acc + f.size, 0);
+
         wrapper.innerHTML = `
             <div class="file-card ${accent}" id="${wrapperId}-card">
                 <div class="file-card-icon">
                     <i class="${iconClass}"></i>
                 </div>
                 <div class="file-card-info">
-                    <span class="file-card-name" title="${file.name}">${file.name}</span>
+                    <span class="file-card-name" title="${displayName}">${displayName}</span>
                     <div class="file-card-meta">
-                        <span class="file-card-size">${formatSize(file.size)}</span>
-                        <span class="file-card-badge">${ext}</span>
+                        <span class="file-card-size">${formatSize(totalSize)}</span>
+                        <span class="file-card-badge">${isMultiple ? 'BATCH' : ext}</span>
                     </div>
                     <div class="file-card-status">
                         <span class="status-dot" id="${wrapperId}-status-dot"></span>
                         <span id="${wrapperId}-status-text">Ready to process</span>
                     </div>
                 </div>
-                <button class="file-card-remove" id="${wrapperId}-remove-btn" title="Remove file">
+                <button class="file-card-remove" id="${wrapperId}-remove-btn" title="Remove">
                     <i class="fas fa-times"></i>
                 </button>
             </div>`;
@@ -261,17 +271,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
         zone.addEventListener('drop', e => {
             e.preventDefault();
-            console.log(`File(s) dropped on ${zoneId}`);
             zone.classList.remove('drag-over');
-            if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-                onFiles(e.dataTransfer.files);
+            const files = Array.from(e.dataTransfer.files);
+            if (files.length > MAX_FILES) {
+                showToast(`Max ${MAX_FILES} files allowed.`, true);
+                return;
+            }
+            if (files.length > 0) {
+                onFiles(files);
             }
         });
 
         input.addEventListener('change', () => {
-            console.log(`File(s) selected via input for ${zoneId}`);
-            if (input.files && input.files.length > 0) {
-                onFiles(input.files);
+            const files = Array.from(input.files);
+            if (files.length > MAX_FILES) {
+                showToast(`Max ${MAX_FILES} files allowed.`, true);
+                input.value = '';
+                return;
+            }
+            if (files.length > 0) {
+                onFiles(files);
             }
         });
     }
@@ -312,19 +331,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const summaryRange = document.getElementById('summary-range');
     const rangeLabel = document.getElementById('range-label');
 
-    let currentExtractFile = null;
+    let currentExtractFiles = [];
     const extractActionContainer = document.getElementById('extract-action-container');
     const startExtractBtn = document.getElementById('start-extract-btn');
 
     setupDropZone('extract-drop-zone', 'pdfFile', files => {
-        if (files[0]) {
-            currentExtractFile = files[0];
-            showFileCard('extract-file-card', files[0], 'accent-indigo', 'fas fa-file-pdf', () => {
+        if (files.length > 0) {
+            currentExtractFiles = Array.from(files);
+            showFileCard('extract-file-card', currentExtractFiles, 'accent-indigo', 'fas fa-file-pdf', () => {
                 document.getElementById('pdfFile').value = '';
                 extractResults.classList.add('hidden');
                 extractActionContainer.classList.add('hidden');
                 extractedText = '';
-                currentExtractFile = null;
+                currentExtractFiles = [];
             });
             extractActionContainer.classList.remove('hidden');
             extractResults.classList.add('hidden');
@@ -332,41 +351,51 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     startExtractBtn?.addEventListener('click', () => {
-        if (currentExtractFile) {
+        if (currentExtractFiles.length > 0) {
             extractActionContainer.classList.add('hidden');
-            handleExtract(currentExtractFile);
+            handleExtract(currentExtractFiles);
         }
     });
 
-    async function handleExtract(file) {
-        if (!file || file.type !== 'application/pdf') return showToast('Please select a valid PDF file.', true);
+    async function handleExtract(files) {
+        if (!files.length) return showToast('Please select valid PDF files.', true);
         updateFileCardStatus('extract-file-card', 'Processing...');
         extractLoader.classList.remove('hidden');
         extractResults.classList.add('hidden');
         try {
-            const buf = await file.arrayBuffer();
-            const pdf = await pdfjsLib.getDocument({ data: buf.slice(0) }).promise;
-            let fullText = '';
-            for (let i = 1; i <= pdf.numPages; i++) {
-                const page = await pdf.getPage(i);
-                const content = await page.getTextContent();
-                fullText += content.items.map(it => it.str).join(' ') + '\n\n';
+            let combinedText = '';
+            let totalPages = 0;
+            
+            for (const file of files) {
+                if (file.type !== 'application/pdf') continue;
+                const buf = await file.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument({ data: buf.slice(0) }).promise;
+                totalPages += pdf.numPages;
+                
+                let fileText = `--- FILE: ${file.name} ---\n`;
+                for (let i = 1; i <= pdf.numPages; i++) {
+                    const page = await pdf.getPage(i);
+                    const content = await page.getTextContent();
+                    fileText += content.items.map(it => it.str).join(' ') + '\n';
+                }
+                combinedText += fileText + '\n\n';
             }
-            extractedText = fullText.trim();
+            
+            extractedText = combinedText.trim();
             textOutput.textContent = extractedText;
-            document.getElementById('stat-pages').textContent = pdf.numPages;
+            document.getElementById('stat-pages').textContent = totalPages;
             document.getElementById('stat-words').textContent = extractedText.split(/\s+/).filter(Boolean).length;
             document.getElementById('stat-chars').textContent = extractedText.length;
             updateSummary();
             updateFileCardStatus('extract-file-card', 'Completed');
             extractLoader.classList.add('hidden');
             extractResults.classList.remove('hidden');
-            showToast('✅ PDF extracted successfully!');
+            showToast(`✅ ${files.length > 1 ? 'Batch' : 'PDF'} extracted successfully!`);
         } catch (err) {
             console.error(err);
             updateFileCardStatus('extract-file-card', 'Error', true);
             extractLoader.classList.add('hidden');
-            showToast('Error reading PDF file.', true);
+            showToast('Error reading PDF files.', true);
         }
     }
 
@@ -510,18 +539,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const wordDownloadBanner = document.getElementById('word-download-banner');
     const wordDownloadBtn = document.getElementById('word-download-btn');
 
-    let currentWordFile = null;
+    let currentWordFiles = [];
     const wordActionContainer = document.getElementById('word-action-container');
     const startWordBtn = document.getElementById('start-word-btn');
 
     setupDropZone('word-drop-zone', 'wordFile', files => {
-        if (files[0]) {
-            currentWordFile = files[0];
-            showFileCard('word-file-card', files[0], 'accent-blue', 'fas fa-file-word', () => {
+        if (files.length > 0) {
+            currentWordFiles = Array.from(files);
+            showFileCard('word-file-card', currentWordFiles, 'accent-blue', 'fas fa-file-word', () => {
                 document.getElementById('wordFile').value = '';
                 wordDownloadBanner.classList.add('hidden');
                 wordActionContainer.classList.add('hidden');
-                currentWordFile = null;
+                currentWordFiles = [];
             });
             wordActionContainer.classList.remove('hidden');
             wordDownloadBanner.classList.add('hidden');
@@ -529,9 +558,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     startWordBtn?.addEventListener('click', () => {
-        if (currentWordFile) {
+        if (currentWordFiles.length > 0) {
             wordActionContainer.classList.add('hidden');
-            handleOfficeConvert(currentWordFile, 'docx', 'word');
+            handleOfficeConvertBatch(currentWordFiles, 'docx', 'word');
         }
     });
 
@@ -543,16 +572,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const excelDownloadBtn = document.getElementById('excel-download-btn');
     const excelActionContainer = document.getElementById('excel-action-container');
     const startExcelBtn = document.getElementById('start-excel-btn');
-    let currentExcelFile = null;
+    let currentExcelFiles = [];
 
     setupDropZone('excel-drop-zone', 'excelFile', files => {
-        if (files[0]) {
-            currentExcelFile = files[0];
-            showFileCard('excel-file-card', files[0], 'accent-green', 'fas fa-file-excel', () => {
+        if (files.length > 0) {
+            currentExcelFiles = Array.from(files);
+            showFileCard('excel-file-card', currentExcelFiles, 'accent-green', 'fas fa-file-excel', () => {
                 document.getElementById('excelFile').value = '';
                 excelActionContainer.classList.add('hidden');
                 excelDownloadBanner.classList.add('hidden');
-                currentExcelFile = null;
+                currentExcelFiles = [];
             });
             excelActionContainer.classList.remove('hidden');
             excelDownloadBanner.classList.add('hidden');
@@ -560,9 +589,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     startExcelBtn?.addEventListener('click', () => {
-        if (currentExcelFile) {
+        if (currentExcelFiles.length > 0) {
             excelActionContainer.classList.add('hidden');
-            handleOfficeConvert(currentExcelFile, 'xlsx', 'excel');
+            handleOfficeConvertBatch(currentExcelFiles, 'xlsx', 'excel');
         }
     });
 
@@ -574,16 +603,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const pptDownloadBtn = document.getElementById('ppt-download-btn');
     const pptActionContainer = document.getElementById('ppt-action-container');
     const startPptBtn = document.getElementById('start-ppt-btn');
-    let currentPptFile = null;
+    let currentPptFiles = [];
 
     setupDropZone('ppt-drop-zone', 'pptFile', files => {
-        if (files[0]) {
-            currentPptFile = files[0];
-            showFileCard('ppt-file-card', files[0], 'accent-orange', 'fas fa-file-powerpoint', () => {
+        if (files.length > 0) {
+            currentPptFiles = Array.from(files);
+            showFileCard('ppt-file-card', currentPptFiles, 'accent-orange', 'fas fa-file-powerpoint', () => {
                 document.getElementById('pptFile').value = '';
                 pptActionContainer.classList.add('hidden');
                 pptDownloadBanner.classList.add('hidden');
-                currentPptFile = null;
+                currentPptFiles = [];
             });
             pptActionContainer.classList.remove('hidden');
             pptDownloadBanner.classList.add('hidden');
@@ -591,69 +620,77 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     startPptBtn?.addEventListener('click', () => {
-        if (currentPptFile) {
+        if (currentPptFiles.length > 0) {
             pptActionContainer.classList.add('hidden');
-            handleOfficeConvert(currentPptFile, 'pptx', 'ppt');
+            handleOfficeConvertBatch(currentPptFiles, 'pptx', 'ppt');
         }
     });
 
-    /* Reusable Office Converter (Word, Excel, PPT) via ConvertAPI */
-    async function handleOfficeConvert(file, fromExt, toolPrefix) {
+    /* Reusable Office Converter (Word, Excel, PPT) via ConvertAPI - BATCH SUPPORT */
+    async function handleOfficeConvertBatch(files, fromExt, toolPrefix) {
         const loader = document.getElementById(`${toolPrefix}-loader`);
         const banner = document.getElementById(`${toolPrefix}-download-banner`);
-        const btn = document.getElementById(`${toolPrefix}-download-btn`);
         const cardId = `${toolPrefix}-file-card`;
 
-        updateFileCardStatus(cardId, 'Processing...');
+        updateFileCardStatus(cardId, 'Processing Batch...');
         loader.classList.remove('hidden');
         banner.classList.add('hidden');
 
-        try {
-            const CONVERT_API_SECRET = 'KgInQw3FbUZG1opX6VTqE9EyXsQzMB57';
-            const base64 = await new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => resolve(reader.result.split(',')[1]);
-                reader.onerror = reject;
-                reader.readAsDataURL(file);
-            });
+        let successCount = 0;
 
-            const response = await fetch(
-                `https://v2.convertapi.com/convert/${fromExt}/to/pdf?Secret=${CONVERT_API_SECRET}`,
-                {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        Parameters: [
-                            { Name: 'File', FileValue: { Name: file.name, Data: base64 } },
-                            { Name: 'StoreFile', Value: true }
-                        ]
-                    })
+        for (const file of files) {
+            try {
+                updateFileCardStatus(cardId, `Processing ${file.name}...`);
+                const CONVERT_API_SECRET = 'KgInQw3FbUZG1opX6VTqE9EyXsQzMB57';
+                const base64 = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result.split(',')[1]);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);
+                });
+
+                const response = await fetch(
+                    `https://v2.convertapi.com/convert/${fromExt}/to/pdf?Secret=${CONVERT_API_SECRET}`,
+                    {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            Parameters: [
+                                { Name: 'File', FileValue: { Name: file.name, Data: base64 } },
+                                { Name: 'StoreFile', Value: true }
+                            ]
+                        })
+                    }
+                );
+
+                if (!response.ok) throw new Error('API Error');
+
+                const data = await response.json();
+                const pdfResponse = await fetch(data.Files[0].Url);
+                const pdfBlob = await pdfResponse.blob();
+                
+                // For batch, we trigger individual downloads
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(pdfBlob);
+                link.download = file.name.substring(0, file.name.lastIndexOf('.')) + '.pdf';
+                link.click();
+                
+                successCount++;
+            } catch (err) {
+                console.error(`ConvertAPI failed for ${file.name}:`, err);
+                if (fromExt === 'docx') {
+                    await handleWordLocalFallback(file);
+                    successCount++;
                 }
-            );
-
-            if (!response.ok) throw new Error('API Error');
-
-            const data = await response.json();
-            const pdfResponse = await fetch(data.Files[0].Url);
-            const pdfBlob = await pdfResponse.blob();
-
-            btn.href = URL.createObjectURL(pdfBlob);
-            btn.download = file.name.substring(0, file.name.lastIndexOf('.')) + '.pdf';
-            updateFileCardStatus(cardId, 'Completed');
-            loader.classList.add('hidden');
-            banner.classList.remove('hidden');
-            showToast('✅ Conversion successful!');
-
-        } catch (err) {
-            console.error('ConvertAPI failed:', err);
-            // Local fallback only for Word
-            if (fromExt === 'docx') {
-                handleWordLocalFallback(file);
-            } else {
-                updateFileCardStatus(cardId, 'Error', true);
-                loader.classList.add('hidden');
-                showToast('Conversion failed. Check your internet.', true);
             }
+        }
+
+        updateFileCardStatus(cardId, 'Completed');
+        loader.classList.add('hidden');
+        if (successCount > 0) {
+            showToast(`✅ Successfully processed ${successCount} files!`);
+        } else {
+            showToast('All conversions failed.', true);
         }
     }
 
@@ -1230,7 +1267,7 @@ document.addEventListener('DOMContentLoaded', () => {
     /* ════════════════════════════════════════════
        TOOL 8 · Lock PDF (Password Protect)
     ════════════════════════════════════════════ */
-    let lockBuffer = null;
+    let currentLockFiles = [];
 
     const lockForm = document.getElementById('lock-form');
     const lockLoader = document.getElementById('lock-loader');
@@ -1241,28 +1278,25 @@ document.addEventListener('DOMContentLoaded', () => {
     const startLockBtn = document.getElementById('start-lock-btn');
 
     setupDropZone('lock-drop-zone', 'lockFile', files => {
-        if (files[0]) {
-            lockBuffer = null; // reset
-            showFileCard('lock-file-card', files[0], 'accent-amber', 'fas fa-lock', () => {
+        if (files.length > 0) {
+            currentLockFiles = Array.from(files);
+            showFileCard('lock-file-card', currentLockFiles, 'accent-amber', 'fas fa-lock', () => {
                 document.getElementById('lockFile').value = '';
                 lockForm.classList.add('hidden');
                 lockDownloadBanner.classList.add('hidden');
                 lockActionContainer.classList.add('hidden');
-                lockBuffer = null;
+                currentLockFiles = [];
             });
             lockActionContainer.classList.remove('hidden');
             lockForm.classList.add('hidden');
             lockDownloadBanner.classList.add('hidden');
-
-            // Still need to load the buffer for handleLockFile to work later
-            const reader = new FileReader();
-            reader.onload = e => { lockBuffer = e.target.result; document.getElementById('lock-filename').textContent = files[0].name; };
-            reader.readAsArrayBuffer(files[0]);
+            
+            document.getElementById('lock-filename').textContent = files.length === 1 ? files[0].name : `${files.length} PDFs selected`;
         }
     });
 
     startLockBtn?.addEventListener('click', () => {
-        if (lockBuffer) {
+        if (currentLockFiles.length > 0) {
             lockActionContainer.classList.add('hidden');
             lockForm.classList.remove('hidden');
         }
@@ -1276,48 +1310,58 @@ document.addEventListener('DOMContentLoaded', () => {
         if (pwd !== confirm) return showToast('Passwords do not match!', true);
         if (pwd.length < 4) return showToast('Password must be at least 4 characters.', true);
 
-        updateFileCardStatus('lock-file-card', 'Processing...');
+        updateFileCardStatus('lock-file-card', 'Processing Batch...');
         lockLoader.classList.remove('hidden');
         lockForm.classList.add('hidden');
         lockDownloadBanner.classList.add('hidden');
 
+        let successCount = 0;
         try {
             const { PDFDocument } = PDFLib;
-            const pdfDoc = await PDFDocument.load(lockBuffer.slice(0), { ignoreEncryption: true });
+            
+            for (const file of currentLockFiles) {
+                try {
+                    const buf = await file.arrayBuffer();
+                    const pdfDoc = await PDFDocument.load(buf.slice(0), { ignoreEncryption: true });
 
-            // PDF-lib encrypts with user & owner password
-            const pdfBytes = await pdfDoc.save({
-                userPassword: pwd,
-                ownerPassword: pwd + '_owner',
-                permissions: {
-                    printing: 'highResolution',
-                    modifying: false,
-                    copying: false,
-                    annotating: false,
-                    fillingForms: false,
-                    contentAccessibility: true,
-                    documentAssembly: false,
-                },
-            });
+                    const pdfBytes = await pdfDoc.save({
+                        userPassword: pwd,
+                        ownerPassword: pwd + '_owner',
+                        permissions: {
+                            printing: 'highResolution',
+                            modifying: false,
+                            copying: false,
+                            annotating: false,
+                            fillingForms: false,
+                            contentAccessibility: true,
+                            documentAssembly: false,
+                        },
+                    });
 
-            const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-            lockDownloadBtn.href = URL.createObjectURL(blob);
+                    const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = `locked_${file.name}`;
+                    link.click();
+                    successCount++;
+                } catch (e) { console.error(`Lock failed for ${file.name}`, e); }
+            }
+
             updateFileCardStatus('lock-file-card', 'Completed');
             lockLoader.classList.add('hidden');
-            lockDownloadBanner.classList.remove('hidden');
-            showToast('🔒 PDF locked successfully!');
+            showToast(`✅ ${successCount} files locked successfully!`);
         } catch (err) {
             console.error(err);
             lockLoader.classList.add('hidden');
             lockForm.classList.remove('hidden');
-            showToast('Error encrypting PDF. Try another file.', true);
+            showToast('Error during batch encryption.', true);
         }
     });
 
     /* ════════════════════════════════════════════
        TOOL 9 · Page Numbering
     ════════════════════════════════════════════ */
-    let numberBuffer = null;
+    let currentNumberFiles = [];
     const numberOptions = document.getElementById('number-options');
     const numberLoader = document.getElementById('number-loader');
     const numberDownloadBanner = document.getElementById('number-download-banner');
@@ -1325,88 +1369,87 @@ document.addEventListener('DOMContentLoaded', () => {
     const startNumberBtn = document.getElementById('start-number-btn');
 
     setupDropZone('number-drop-zone', 'numberFile', files => {
-        if (files[0]) {
-            numberBuffer = null;
-            showFileCard('number-file-card', files[0], 'accent-green', 'fas fa-list-ol', () => {
+        if (files.length > 0) {
+            currentNumberFiles = Array.from(files);
+            showFileCard('number-file-card', currentNumberFiles, 'accent-green', 'fas fa-list-ol', () => {
                 document.getElementById('numberFile').value = '';
                 numberOptions.classList.add('hidden');
                 numberDownloadBanner.classList.add('hidden');
-                numberBuffer = null;
+                currentNumberFiles = [];
             });
             numberOptions.classList.remove('hidden');
             numberDownloadBanner.classList.add('hidden');
-
-            const reader = new FileReader();
-            reader.onload = e => { numberBuffer = e.target.result; };
-            reader.readAsArrayBuffer(files[0]);
         }
     });
 
     startNumberBtn?.addEventListener('click', async () => {
-        if (!numberBuffer) return showToast('Please select a PDF file.', true);
+        if (!currentNumberFiles.length) return showToast('Please select PDF files.', true);
 
         const pos = document.getElementById('number-pos').value;
         const format = document.getElementById('number-format').value;
         const startPage = parseInt(document.getElementById('number-start').value) || 1;
 
-        updateFileCardStatus('number-file-card', 'Processing...');
+        updateFileCardStatus('number-file-card', 'Processing Batch...');
         numberLoader.classList.remove('hidden');
         numberOptions.classList.add('hidden');
         numberDownloadBanner.classList.add('hidden');
 
+        let successCount = 0;
         try {
             const { PDFDocument, rgb, StandardFonts } = PDFLib;
-            const pdfDoc = await PDFDocument.load(numberBuffer.slice(0));
-            const pages = pdfDoc.getPages();
-            const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-            const totalPages = pages.length;
+            
+            for (const file of currentNumberFiles) {
+                try {
+                    const buf = await file.arrayBuffer();
+                    const pdfDoc = await PDFDocument.load(buf.slice(0));
+                    const pages = pdfDoc.getPages();
+                    const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+                    const totalPages = pages.length;
 
-            for (let i = 0; i < totalPages; i++) {
-                const page = pages[i];
-                const { width, height } = page.getSize();
-                const pageNum = startPage + i;
-                
-                let text = '';
-                if (format === 'simple') text = `${pageNum}`;
-                else if (format === 'page-n') text = `Page ${pageNum}`;
-                else if (format === 'n-of-m') text = `Page ${pageNum} of ${totalPages}`;
-                else if (format === 'dash') text = `- ${pageNum} -`;
+                    for (let i = 0; i < totalPages; i++) {
+                        const page = pages[i];
+                        const { width, height } = page.getSize();
+                        const pageNum = startPage + i;
+                        
+                        let text = '';
+                        if (format === 'simple') text = `${pageNum}`;
+                        else if (format === 'page-n') text = `Page ${pageNum}`;
+                        else if (format === 'n-of-m') text = `Page ${pageNum} of ${totalPages}`;
+                        else if (format === 'dash') text = `- ${pageNum} -`;
 
-                const fontSize = 12;
-                const textWidth = font.widthOfTextAtSize(text, fontSize);
-                const margin = 30;
+                        const fontSize = 12;
+                        const textWidth = font.widthOfTextAtSize(text, fontSize);
+                        const margin = 30;
 
-                let x, y;
-                // Vertical
-                if (pos.startsWith('bottom')) y = margin;
-                else y = height - margin;
+                        let x, y;
+                        if (pos.startsWith('bottom')) y = margin;
+                        else y = height - margin;
 
-                // Horizontal
-                if (pos.endsWith('left')) x = margin;
-                else if (pos.endsWith('right')) x = width - textWidth - margin;
-                else x = (width / 2) - (textWidth / 2);
+                        if (pos.endsWith('left')) x = margin;
+                        else if (pos.endsWith('right')) x = width - textWidth - margin;
+                        else x = (width / 2) - (textWidth / 2);
 
-                page.drawText(text, {
-                    x, y,
-                    size: fontSize,
-                    font,
-                    color: rgb(0.4, 0.4, 0.4)
-                });
+                        page.drawText(text, { x, y, size: fontSize, font, color: rgb(0.4, 0.4, 0.4) });
+                    }
+
+                    const bytes = await pdfDoc.save();
+                    const blob = new Blob([bytes], { type: 'application/pdf' });
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = `numbered_${file.name}`;
+                    link.click();
+                    successCount++;
+                } catch (e) { console.error(`Numbering failed for ${file.name}`, e); }
             }
 
-            const bytes = await pdfDoc.save();
-            const blob = new Blob([bytes], { type: 'application/pdf' });
-            numberDownloadBtn.href = URL.createObjectURL(blob);
-            
             updateFileCardStatus('number-file-card', 'Completed');
             numberLoader.classList.add('hidden');
-            numberDownloadBanner.classList.remove('hidden');
-            showToast('✅ Page numbering applied!');
+            showToast(`✅ ${successCount} files numbered successfully!`);
         } catch (err) {
             console.error(err);
             numberLoader.classList.add('hidden');
             numberOptions.classList.remove('hidden');
-            showToast('Error applying page numbers.', true);
+            showToast('Error during batch numbering.', true);
         }
     });
 
