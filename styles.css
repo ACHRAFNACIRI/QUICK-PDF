@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
     --primary: #4f46e5;
@@ -61,7 +61,7 @@ body.dark-mode {
 }
 
 body {
-    font-family: 'Outfit', sans-serif;
+    font-family: 'Poppins', sans-serif;
     background: var(--bg);
     color: var(--text-primary);
     min-height: 100vh;
@@ -127,6 +127,8 @@ body {
     margin-bottom: 2.5rem;
     overflow-x: auto;
     white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
 }
 
 .tool-nav::-webkit-scrollbar {
@@ -292,12 +294,33 @@ body.dark-mode .drop-zone:hover {
 }
 
 .loader {
-    width: 48px;
-    height: 48px;
-    border: 4px solid var(--border);
+    width: 50px;
+    height: 50px;
+    border: 3px solid transparent;
     border-top-color: var(--primary);
     border-radius: 50%;
-    animation: spin 0.8s linear infinite;
+    animation: spin 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+    position: relative;
+}
+
+.loader::before {
+    content: '';
+    position: absolute;
+    inset: 5px;
+    border: 3px solid transparent;
+    border-top-color: var(--primary-light);
+    border-radius: 50%;
+    animation: spin 1.5s linear infinite;
+}
+
+.loader::after {
+    content: '';
+    position: absolute;
+    inset: 13px;
+    border: 3px solid transparent;
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 2s ease-in-out infinite;
 }
 
 /* ─── Stats Cards ─── */
@@ -668,6 +691,16 @@ body.dark-mode .drop-zone:hover {
     }
 }
 
+@keyframes pulse-soft {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4); }
+    70% { transform: scale(1.02); box-shadow: 0 0 0 10px rgba(99, 102, 241, 0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
+}
+
+.btn-primary.btn-lg:not(.hidden) {
+    animation: pulse-soft 2s infinite;
+}
+
 @keyframes spin {
     to {
         transform: rotate(360deg);
@@ -899,119 +932,148 @@ body.dark-mode .drop-zone:hover {
 /* ─── Mobile Responsiveness ─── */
 @media (max-width: 768px) {
     .container {
-        padding: 2rem 1rem;
+        padding: 1.5rem 1rem;
+    }
+
+    .app-header {
+        padding-bottom: 2rem !important;
     }
 
     .app-header h1 {
-        font-size: 2rem;
+        font-size: 1.8rem;
     }
 
     .app-header p {
-        font-size: 0.9rem;
+        font-size: 0.85rem;
     }
 
     .tool-nav {
-        padding: 6px;
-        gap: 2px;
+        margin: 0 -1rem 2rem;
+        border-radius: 0;
+        padding: 10px 1rem;
+        width: calc(100% + 2rem);
     }
 
     .nav-btn {
-        padding: 8px 12px;
-        font-size: 0.8rem;
+        padding: 10px 16px;
+        font-size: 0.85rem;
     }
 
     .drop-zone {
-        padding: 2.5rem 1rem;
+        padding: 3rem 1.5rem;
+        margin: 0 auto;
+        max-width: 100%;
     }
 
     .drop-zone__icon {
-        font-size: 2.2rem;
+        font-size: 2.5rem;
     }
 
     .stats-container {
         grid-template-columns: 1fr;
-        gap: 0.8rem;
-    }
-
-    .stat-value {
-        font-size: 1.5rem;
+        gap: 1rem;
     }
 
     .toolbar {
         flex-direction: column;
         align-items: stretch;
-    }
-
-    .search-box {
-        max-width: none;
+        gap: 1rem;
     }
 
     .actions {
+        flex-direction: column;
         width: 100%;
-        justify-content: center;
     }
 
     .btn {
-        flex: 1;
+        width: 100%;
         justify-content: center;
+        padding: 0.9rem;
+        font-size: 1rem;
+    }
+
+    .btn-lg {
+        width: 100%;
     }
 
     .edit-workspace {
-        flex-direction: column;
-        padding: 1rem;
+        flex-direction: column !important;
+        gap: 1.5rem !important;
+        padding: 1rem !important;
+        border-radius: 20px !important;
     }
 
     .edit-workspace > div:first-child {
         width: 100% !important;
-        margin-bottom: 1rem;
+        max-width: none !important;
+        position: relative !important;
     }
 
-    /* Modal Adjustments */
-    .modal-content {
-        width: 95% !important;
-        padding: 1.5rem !important;
-        margin: 1rem;
+    .pages-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 1rem;
+        padding: 1rem;
     }
 
     #anno-modal > div {
-        height: 100vh !important;
-        width: 100vw !important;
+        width: 100% !important;
+        height: 100% !important;
         border-radius: 0 !important;
     }
 
-    /* Footer Mobile Fixes */
+    .anno-modal-header {
+        padding: 1rem !important;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .anno-tools-center {
+        order: 3;
+        width: 100%;
+        overflow-x: auto;
+        padding-bottom: 5px;
+    }
+
+    .tool-group, .style-group {
+        flex-shrink: 0;
+    }
+
+    /* Footer Mobile */
     .footer-container {
-        flex-direction: column !important;
-        text-align: center !important;
-        align-items: center !important;
+        flex-direction: column;
+        text-align: center;
+        gap: 1.5rem;
     }
 
-    footer div div {
-        text-align: center !important;
-        align-items: center !important;
-        width: 100% !important;
+    .footer-brand-info, .footer-actions {
+        align-items: center;
+        text-align: center;
     }
 
-    footer div div:last-child {
-        align-items: center !important;
-    }
-
-    footer p {
-        margin: 5px auto !important;
+    .footer-legal-links {
+        justify-content: center;
+        gap: 1rem;
     }
 }
 
 @media (max-width: 480px) {
     .app-header h1 {
-        font-size: 1.8rem;
+        font-size: 1.5rem;
     }
-    
+
     .nav-btn span {
-        display: none; /* Hide text on very small screens to keep icons */
+        display: none;
     }
 
     .nav-btn {
-        padding: 10px;
+        padding: 12px;
+        width: 48px;
+        height: 48px;
+        justify-content: center;
+    }
+
+    .drop-zone__prompt {
+        font-size: 1rem;
     }
 }
 

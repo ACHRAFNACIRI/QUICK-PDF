@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateLanguage(lang) {
         document.documentElement.dir = (lang === 'ar') ? 'rtl' : 'ltr';
-        
+
         // Update elements with data-i18n attribute
         document.querySelectorAll('[data-i18n]').forEach(el => {
             const key = el.getAttribute('data-i18n');
@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
     /* ─── Utility: Theme Toggle ─── */
     const themeBtn = document.getElementById('theme-toggle');
     const themeIcon = document.getElementById('theme-icon');
-    
+
     // Load saved theme
     if (localStorage.getItem('theme') === 'dark') {
         document.body.classList.add('dark-mode');
@@ -112,8 +112,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /* ─── Utility: TOS Section ─── */
     const tosSection = document.getElementById('tos-section');
-    const tosLink    = document.getElementById('tos-link');
-    const tosBack    = document.getElementById('tos-back-btn');
+    const tosLink = document.getElementById('tos-link');
+    const tosBack = document.getElementById('tos-back-btn');
 
     tosLink?.addEventListener('click', (e) => {
         e.preventDefault();
@@ -134,7 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /* ─── Utility: Privacy Section ─── */
     const privacySection = document.getElementById('privacy-section');
-    const privacyLink    = document.getElementById('privacy-link');
+    const privacyLink = document.getElementById('privacy-link');
 
     privacyLink?.addEventListener('click', (e) => {
         e.preventDefault();
@@ -216,11 +216,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const dot = document.getElementById(`${wrapperId}-status-dot`);
         const text = document.getElementById(`${wrapperId}-status-text`);
         if (!dot || !text) return;
-        
+
         text.textContent = status;
         dot.classList.remove('success');
         dot.style.background = isError ? '#ef4444' : (status === 'Processing...' ? '#6366f1' : '#10b981');
-        
+
         if (status === 'Processing...') {
             dot.style.animation = 'pulse-dot 1s infinite';
         } else if (status === 'Completed') {
@@ -238,22 +238,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function setupDropZone(zoneId, inputId, onFiles) {
-        const zone  = document.getElementById(zoneId);
+        const zone = document.getElementById(zoneId);
         const input = document.getElementById(inputId);
         if (!zone || !input) return;
 
-        zone.addEventListener('click',  () => {
+        zone.addEventListener('click', () => {
             console.log(`Drop zone ${zoneId} clicked`);
             input.click();
         });
 
-        zone.addEventListener('dragover', e => { 
-            e.preventDefault(); 
-            zone.classList.add('drag-over'); 
+        zone.addEventListener('dragover', e => {
+            e.preventDefault();
+            zone.classList.add('drag-over');
         });
 
-        zone.addEventListener('dragleave', () => { 
-            zone.classList.remove('drag-over'); 
+        zone.addEventListener('dragleave', () => {
+            zone.classList.remove('drag-over');
         });
 
         zone.addEventListener('drop', e => {
@@ -274,7 +274,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /* ─── Navigation ─── */
-    const navBtns   = document.querySelectorAll('.nav-btn');
+    const navBtns = document.querySelectorAll('.nav-btn');
     const toolPanels = document.querySelectorAll('.tool-container');
     navBtns.forEach(btn => {
         btn.addEventListener('click', () => {
@@ -286,7 +286,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     /* ─── Tab Switching (Extractor) ─── */
-    const tabBtns   = document.querySelectorAll('.tab-btn');
+    const tabBtns = document.querySelectorAll('.tab-btn');
     const tabPanels = document.querySelectorAll('.tab-panel');
     tabBtns.forEach(btn => {
         btn.addEventListener('click', () => {
@@ -301,13 +301,13 @@ document.addEventListener('DOMContentLoaded', () => {
        TOOL 1 · PDF Extractor
     ════════════════════════════════════════════ */
     let extractedText = '';
-    const extractLoader  = document.getElementById('extract-loader');
+    const extractLoader = document.getElementById('extract-loader');
     const extractResults = document.getElementById('extract-results');
-    const textOutput     = document.getElementById('text-output');
-    const summaryOutput  = document.getElementById('summary-output');
-    const searchInput    = document.getElementById('search-input');
-    const summaryRange   = document.getElementById('summary-range');
-    const rangeLabel     = document.getElementById('range-label');
+    const textOutput = document.getElementById('text-output');
+    const summaryOutput = document.getElementById('summary-output');
+    const searchInput = document.getElementById('search-input');
+    const summaryRange = document.getElementById('summary-range');
+    const rangeLabel = document.getElementById('range-label');
 
     let currentExtractFile = null;
     const extractActionContainer = document.getElementById('extract-action-container');
@@ -345,7 +345,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const pdf = await pdfjsLib.getDocument({ data: buf.slice(0) }).promise;
             let fullText = '';
             for (let i = 1; i <= pdf.numPages; i++) {
-                const page    = await pdf.getPage(i);
+                const page = await pdf.getPage(i);
                 const content = await page.getTextContent();
                 fullText += content.items.map(it => it.str).join(' ') + '\n\n';
             }
@@ -414,19 +414,19 @@ document.addEventListener('DOMContentLoaded', () => {
        TOOL 2 · Image to PDF
     ════════════════════════════════════════════ */
     let selectedImages = [];
-    const imagePreview       = document.getElementById('image-preview-section');
-    const imageGrid          = document.getElementById('image-grid');
-    const imageCount         = document.getElementById('image-count');
+    const imagePreview = document.getElementById('image-preview-section');
+    const imageGrid = document.getElementById('image-grid');
+    const imageCount = document.getElementById('image-count');
     const imageDownloadBanner = document.getElementById('image-download-banner');
-    const imageDownloadBtn   = document.getElementById('image-download-btn');
+    const imageDownloadBtn = document.getElementById('image-download-btn');
 
     const imageActionContainer = document.getElementById('image-action-container');
-    const triggerImageBtn      = document.getElementById('trigger-image-convert-btn');
+    const triggerImageBtn = document.getElementById('trigger-image-convert-btn');
 
     setupDropZone('image-drop-zone', 'imageFiles', files => {
         if (files.length > 0) {
             const label = files.length === 1 ? files[0].name : `${files.length} images selected`;
-            const fakeFile = { name: label, size: Array.from(files).reduce((s,f) => s+f.size, 0) };
+            const fakeFile = { name: label, size: Array.from(files).reduce((s, f) => s + f.size, 0) };
             showFileCard('image-file-card', fakeFile, 'accent-pink', 'fas fa-images', () => {
                 selectedImages = [];
                 renderImageGrid();
@@ -467,7 +467,7 @@ document.addEventListener('DOMContentLoaded', () => {
         selectedImages.forEach((src, i) => {
             const card = document.createElement('div');
             card.className = 'image-card';
-            card.innerHTML = `<img src="${src}" alt="Image ${i+1}">
+            card.innerHTML = `<img src="${src}" alt="Image ${i + 1}">
                 <button class="del-btn" data-idx="${i}"><i class="fas fa-times"></i></button>`;
             imageGrid.appendChild(card);
         });
@@ -503,9 +503,9 @@ document.addEventListener('DOMContentLoaded', () => {
     /* ════════════════════════════════════════════
        TOOL 3 · Word to PDF
     ════════════════════════════════════════════ */
-    const wordLoader         = document.getElementById('word-loader');
+    const wordLoader = document.getElementById('word-loader');
     const wordDownloadBanner = document.getElementById('word-download-banner');
-    const wordDownloadBtn    = document.getElementById('word-download-btn');
+    const wordDownloadBtn = document.getElementById('word-download-btn');
 
     let currentWordFile = null;
     const wordActionContainer = document.getElementById('word-action-container');
@@ -598,7 +598,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function handleOfficeConvert(file, fromExt, toolPrefix) {
         const loader = document.getElementById(`${toolPrefix}-loader`);
         const banner = document.getElementById(`${toolPrefix}-download-banner`);
-        const btn    = document.getElementById(`${toolPrefix}-download-btn`);
+        const btn = document.getElementById(`${toolPrefix}-download-btn`);
         const cardId = `${toolPrefix}-file-card`;
 
         updateFileCardStatus(cardId, 'Processing...');
@@ -663,7 +663,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const container = document.createElement('div');
             container.innerHTML = styledHtml;
             document.body.appendChild(container);
-            const pdfBlob = await html2pdf().from(container).set({ margin:10 }).output('blob');
+            const pdfBlob = await html2pdf().from(container).set({ margin: 10 }).output('blob');
             document.body.removeChild(container);
             wordDownloadBtn.href = URL.createObjectURL(pdfBlob);
             wordDownloadBtn.download = file.name.replace('.docx', '.pdf');
@@ -682,17 +682,17 @@ document.addEventListener('DOMContentLoaded', () => {
        TOOL 6 · Merge PDF
     ════════════════════════════════════════════ */
     let mergeFiles = [];
-    const mergeListSection   = document.getElementById('merge-list-section');
-    const mergeFileList      = document.getElementById('merge-file-list');
-    const mergeCount         = document.getElementById('merge-count');
-    const mergeLoader        = document.getElementById('merge-loader');
+    const mergeListSection = document.getElementById('merge-list-section');
+    const mergeFileList = document.getElementById('merge-file-list');
+    const mergeCount = document.getElementById('merge-count');
+    const mergeLoader = document.getElementById('merge-loader');
     const mergeDownloadBanner = document.getElementById('merge-download-banner');
-    const mergeDownloadBtn   = document.getElementById('merge-download-btn');
+    const mergeDownloadBtn = document.getElementById('merge-download-btn');
 
     setupDropZone('merge-drop-zone', 'mergeFiles', files => {
         if (files.length > 0) {
             const label = files.length === 1 ? files[0].name : `${files.length} PDFs selected`;
-            const fakeFile = { name: label, size: Array.from(files).reduce((s,f) => s+f.size, 0) };
+            const fakeFile = { name: label, size: Array.from(files).reduce((s, f) => s + f.size, 0) };
             showFileCard('merge-file-card', fakeFile, 'accent-violet', 'fas fa-object-group', () => {
                 mergeFiles = [];
                 renderMergeList();
@@ -741,7 +741,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 pages.forEach(p => merged.addPage(p));
             }
             const bytes = await merged.save();
-            const blob  = new Blob([bytes], { type: 'application/pdf' });
+            const blob = new Blob([bytes], { type: 'application/pdf' });
             mergeDownloadBtn.href = URL.createObjectURL(blob);
             mergeLoader.classList.add('hidden');
             mergeDownloadBanner.classList.remove('hidden');
@@ -756,20 +756,20 @@ document.addEventListener('DOMContentLoaded', () => {
     /* ════════════════════════════════════════════
        TOOL 7 · Edit PDF (Rotate + Delete + Annotate)
     ════════════════════════════════════════════ */
-    let editBuffer   = null;
-    let editState    = [];   // [{ rotation, deleted, annotations[] }]
-    let editingPage  = -1;
+    let editBuffer = null;
+    let editState = [];   // [{ rotation, deleted, annotations[] }]
+    let editingPage = -1;
 
-    const editLoader    = document.getElementById('edit-loader');
+    const editLoader = document.getElementById('edit-loader');
     const editWorkspace = document.getElementById('edit-workspace');
-    const pagesGrid     = document.getElementById('pages-grid');
+    const pagesGrid = document.getElementById('pages-grid');
 
     /* Modal refs */
-    const annoModal    = document.getElementById('anno-modal');
-    const annoCanvas   = document.getElementById('anno-canvas');
+    const annoModal = document.getElementById('anno-modal');
+    const annoCanvas = document.getElementById('anno-canvas');
     const annoOverlays = document.getElementById('anno-overlays');
     const annoFontSize = document.getElementById('anno-font-size');
-    const annoColor    = document.getElementById('anno-color');
+    const annoColor = document.getElementById('anno-color');
 
     setupDropZone('edit-drop-zone', 'editFile', files => {
         if (files[0]) showFileCard('edit-file-card', files[0], 'accent-red', 'fas fa-edit', () => {
@@ -787,8 +787,8 @@ document.addEventListener('DOMContentLoaded', () => {
         editWorkspace.classList.add('hidden');
         try {
             editBuffer = await file.arrayBuffer();
-            const pdf  = await pdfjsLib.getDocument({ data: editBuffer.slice(0) }).promise;
-            editState  = Array.from({ length: pdf.numPages }, () => ({ rotation: 0, deleted: false, annotations: [] }));
+            const pdf = await pdfjsLib.getDocument({ data: editBuffer.slice(0) }).promise;
+            editState = Array.from({ length: pdf.numPages }, () => ({ rotation: 0, deleted: false, annotations: [] }));
             await renderEditGrid();
             editLoader.classList.add('hidden');
             editWorkspace.classList.remove('hidden');
@@ -811,12 +811,12 @@ document.addEventListener('DOMContentLoaded', () => {
         pagesGrid.innerHTML = '';
         for (let i = 0; i < pdf.numPages; i++) {
             if (editState[i].deleted) continue;
-            const page     = await pdf.getPage(i + 1);
+            const page = await pdf.getPage(i + 1);
             const viewport = page.getViewport({ scale: 0.4, rotation: editState[i].rotation });
-            const canvas   = document.createElement('canvas');
-            const ctx      = canvas.getContext('2d');
-            canvas.width   = viewport.width;
-            canvas.height  = viewport.height;
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = viewport.width;
+            canvas.height = viewport.height;
             await page.render({ canvasContext: ctx, viewport }).promise;
 
             const card = document.createElement('div');
@@ -836,7 +836,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const btn = e.target.closest('[data-action]');
         if (!btn) return;
         const action = btn.dataset.action;
-        const idx    = +btn.dataset.page;
+        const idx = +btn.dataset.page;
         if (action === 'rotate') {
             editState[idx].rotation = (editState[idx].rotation + 90) % 360;
             renderEditGrid();
@@ -854,14 +854,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let currentZoom = 1;
     async function renderAnnoPage(pageIdx, zoom) {
-        const pdf      = await pdfjsLib.getDocument({ data: editBuffer.slice(0) }).promise;
-        const page     = await pdf.getPage(pageIdx + 1);
-        const containerH = window.innerHeight * 0.75; 
+        const pdf = await pdfjsLib.getDocument({ data: editBuffer.slice(0) }).promise;
+        const page = await pdf.getPage(pageIdx + 1);
+        const containerH = window.innerHeight * 0.75;
         const unscaledVP = page.getViewport({ scale: 1 });
-        const fitScale   = (containerH / unscaledVP.height) * zoom;
-        const viewport   = page.getViewport({ scale: fitScale });
-        
-        annoCanvas.width  = viewport.width;
+        const fitScale = (containerH / unscaledVP.height) * zoom;
+        const viewport = page.getViewport({ scale: fitScale });
+
+        annoCanvas.width = viewport.width;
         annoCanvas.height = viewport.height;
         await page.render({ canvasContext: annoCanvas.getContext('2d'), viewport }).promise;
         document.getElementById('anno-zoom-val').textContent = Math.round(zoom * 100) + '%';
@@ -873,7 +873,7 @@ document.addEventListener('DOMContentLoaded', () => {
         currentZoom = 1;
         const pageNumSpan = document.getElementById('modal-page-num');
         if (pageNumSpan) pageNumSpan.textContent = pageIdx + 1;
-        
+
         await renderAnnoPage(pageIdx, currentZoom);
 
         /* Restore saved annotations */
@@ -901,15 +901,15 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('anno-add-text')?.addEventListener('click', () => {
         annoOverlays.appendChild(createAnnoEl({
             type: 'text', x: 10, y: 10, w: 30, h: 8,
-            color: document.getElementById('anno-color').value, 
-            fontSize: parseInt(document.getElementById('anno-font-size').value) || 24, 
+            color: document.getElementById('anno-color').value,
+            fontSize: parseInt(document.getElementById('anno-font-size').value) || 24,
             text: 'Your text here'
         }));
     });
 
     document.getElementById('anno-add-rect')?.addEventListener('click', () => {
         annoOverlays.appendChild(createAnnoEl({
-            type: 'rect', x: 20, y: 20, w: 20, h: 15, 
+            type: 'rect', x: 20, y: 20, w: 20, h: 15,
             color: document.getElementById('anno-color').value,
             opacity: 1,
             borderWidth: parseInt(document.getElementById('anno-border').value) || 2
@@ -918,7 +918,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('anno-add-circle')?.addEventListener('click', () => {
         annoOverlays.appendChild(createAnnoEl({
-            type: 'circle', x: 25, y: 25, w: 15, h: 15, 
+            type: 'circle', x: 25, y: 25, w: 15, h: 15,
             color: document.getElementById('anno-color').value,
             opacity: 1,
             borderWidth: parseInt(document.getElementById('anno-border').value) || 2
@@ -927,7 +927,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('anno-add-line')?.addEventListener('click', () => {
         annoOverlays.appendChild(createAnnoEl({
-            type: 'line', x: 30, y: 30, w: 20, h: 2, 
+            type: 'line', x: 30, y: 30, w: 20, h: 2,
             color: document.getElementById('anno-color').value,
             opacity: 1,
             borderWidth: parseInt(document.getElementById('anno-border').value) || 2
@@ -944,10 +944,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const reader = new FileReader();
         reader.onload = (ev) => {
             annoOverlays.appendChild(createAnnoEl({
-                type: 'image', x: 25, y: 25, w: 25, h: 25, 
+                type: 'image', x: 25, y: 25, w: 25, h: 25,
                 src: ev.target.result
             }));
-            e.target.value = ''; 
+            e.target.value = '';
         };
         reader.readAsDataURL(file);
     });
@@ -959,7 +959,7 @@ document.addEventListener('DOMContentLoaded', () => {
         el.dataset.borderWidth = data.borderWidth || 2;
         el.dataset.color = data.color || '#6366f1';
         el.dataset.src = data.src || '';
-        
+
         el.style.cssText = `position:absolute; left:${data.x}%; top:${data.y}%;
             width:${data.w}%; height:${data.h}%; pointer-events:auto; cursor:move;
             box-sizing:border-box;`;
@@ -988,14 +988,14 @@ document.addEventListener('DOMContentLoaded', () => {
             el.style.border = 'none';
             el.contentEditable = true;
             el.innerText = data.text || 'Type something...';
-            el.style.fontSize  = (data.fontSize || 24) + 'px';
-            el.style.color     = el.dataset.color;
+            el.style.fontSize = (data.fontSize || 24) + 'px';
+            el.style.color = el.dataset.color;
             el.style.background = 'transparent';
-            el.style.padding   = '4px';
-            el.style.minWidth  = '50px';
+            el.style.padding = '4px';
+            el.style.minWidth = '50px';
             el.style.fontWeight = '700';
-            el.style.overflow  = 'hidden';
-            el.style.outline   = 'none';
+            el.style.overflow = 'hidden';
+            el.style.outline = 'none';
         } else if (data.type !== 'line' && data.type !== 'image' && data.type !== 'circle' && data.type !== 'rect') {
             el.style.background = hexToRgba(el.dataset.color, 1);
         }
@@ -1003,18 +1003,18 @@ document.addEventListener('DOMContentLoaded', () => {
         /* Drag logic */
         el.addEventListener('mousedown', e => {
             if (e.target.tagName === 'BUTTON') return; // Only buttons (delete) prevent drag
-            
+
             // If it's text, we only prevent drag if they are actually typing/selecting
             // But to make it easy to move, we'll allow dragging from anywhere
             const rect = annoCanvas.getBoundingClientRect();
             const startX = e.clientX, startY = e.clientY;
-            const origL  = parseFloat(el.style.left), origT = parseFloat(el.style.top);
-            
+            const origL = parseFloat(el.style.left), origT = parseFloat(el.style.top);
+
             const onMove = ev => {
                 const dx = ((ev.clientX - startX) / rect.width) * 100;
                 const dy = ((ev.clientY - startY) / rect.height) * 100;
                 el.style.left = Math.max(0, Math.min(100 - parseFloat(el.style.width), origL + dx)) + '%';
-                el.style.top  = Math.max(0, Math.min(100 - parseFloat(el.style.height), origT + dy)) + '%';
+                el.style.top = Math.max(0, Math.min(100 - parseFloat(el.style.height), origT + dy)) + '%';
             };
             const onUp = () => {
                 document.removeEventListener('mousemove', onMove);
@@ -1100,7 +1100,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 type: el.dataset.type,
                 x: parseFloat(el.style.left),
                 y: parseFloat(el.style.top),
-                w: (el.offsetWidth  / annoCanvas.width)  * 100,
+                w: (el.offsetWidth / annoCanvas.width) * 100,
                 h: (el.offsetHeight / annoCanvas.height) * 100,
                 color: el.dataset.color,
                 fontSize: parseInt(el.style.fontSize) || 24,
@@ -1121,13 +1121,13 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const { PDFDocument, degrees, rgb, StandardFonts } = PDFLib;
             const pdfDoc = await PDFDocument.load(editBuffer.slice(0));
-            const pages  = pdfDoc.getPages();
+            const pages = pdfDoc.getPages();
             const helveticaFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
             for (let i = 0; i < editState.length; i++) {
                 const state = editState[i];
-                const page  = pages[i];
-                
+                const page = pages[i];
+
                 // Handle Rotation
                 if (state.rotation) {
                     page.setRotation(degrees((page.getRotation().angle + state.rotation) % 360));
@@ -1136,13 +1136,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Apply Annotations
                 for (const a of state.annotations) {
                     const { width, height } = page.getSize();
-                    
+
                     // High-precision coordinate mapping
                     const pdfX = (a.x / 100) * width;
                     const pdfY = height - (a.y / 100) * height;
                     const pdfW = (a.w / 100) * width;
                     const pdfH = (a.h / 100) * height;
-                    
+
                     const col = hexToRgbFloat(a.color);
 
                     if (a.type === 'rect') {
@@ -1192,8 +1192,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     } else if (a.type === 'text') {
                         page.drawText(a.text, {
                             x: pdfX + 5,
-                            y: pdfY - (pdfH / 2) - 5, 
-                            size: (a.fontSize || 24) * (width / 600), 
+                            y: pdfY - (pdfH / 2) - 5,
+                            size: (a.fontSize || 24) * (width / 600),
                             font: helveticaFont,
                             color: rgb(col.r, col.g, col.b)
                         });
@@ -1207,14 +1207,14 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const bytes = await pdfDoc.save();
-            const blob  = new Blob([bytes], { type: 'application/pdf' });
-            const url   = URL.createObjectURL(blob);
-            const link  = document.createElement('a');
+            const blob = new Blob([bytes], { type: 'application/pdf' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
             link.href = url;
             const originalName = document.getElementById('edit-filename').textContent;
             link.download = `edited_${originalName}`;
             link.click();
-            
+
             showToast('✅ PDF Saved Successfully!');
         } catch (err) {
             console.error('Save error:', err);
@@ -1229,13 +1229,13 @@ document.addEventListener('DOMContentLoaded', () => {
     ════════════════════════════════════════════ */
     let lockBuffer = null;
 
-    const lockForm         = document.getElementById('lock-form');
-    const lockLoader       = document.getElementById('lock-loader');
+    const lockForm = document.getElementById('lock-form');
+    const lockLoader = document.getElementById('lock-loader');
     const lockDownloadBanner = document.getElementById('lock-download-banner');
-    const lockDownloadBtn  = document.getElementById('lock-download-btn');
+    const lockDownloadBtn = document.getElementById('lock-download-btn');
 
     const lockActionContainer = document.getElementById('lock-action-container');
-    const startLockBtn        = document.getElementById('start-lock-btn');
+    const startLockBtn = document.getElementById('start-lock-btn');
 
     setupDropZone('lock-drop-zone', 'lockFile', files => {
         if (files[0]) {
@@ -1250,7 +1250,7 @@ document.addEventListener('DOMContentLoaded', () => {
             lockActionContainer.classList.remove('hidden');
             lockForm.classList.add('hidden');
             lockDownloadBanner.classList.add('hidden');
-            
+
             // Still need to load the buffer for handleLockFile to work later
             const reader = new FileReader();
             reader.onload = e => { lockBuffer = e.target.result; document.getElementById('lock-filename').textContent = files[0].name; };
@@ -1266,10 +1266,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.getElementById('lock-btn')?.addEventListener('click', async () => {
-        const pwd     = document.getElementById('lock-password').value;
+        const pwd = document.getElementById('lock-password').value;
         const confirm = document.getElementById('lock-password-confirm').value;
 
-        if (!pwd)          return showToast('Please enter a password.', true);
+        if (!pwd) return showToast('Please enter a password.', true);
         if (pwd !== confirm) return showToast('Passwords do not match!', true);
         if (pwd.length < 4) return showToast('Password must be at least 4 characters.', true);
 
