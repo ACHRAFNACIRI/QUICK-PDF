@@ -166,6 +166,11 @@ body {
 }
 
 /* Colorful active states */
+.nav-btn.dashboard-btn.active {
+    background: #6366f1;
+    box-shadow: 0 6px 16px rgba(99, 102, 241, 0.35);
+}
+
 .nav-btn.extractor-btn.active {
     background: #6366f1;
     box-shadow: 0 6px 16px rgba(99, 102, 241, 0.35);
@@ -1189,23 +1194,12 @@ body.dark-mode .drop-zone:hover {
 }
 
 .page-card-actions {
-    position: absolute;
-    inset: 0;
-    background: rgba(15, 23, 42, 0.7);
-    backdrop-filter: blur(8px);
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 12px;
-    border-radius: 20px;
-    opacity: 0;
-    visibility: hidden;
+    margin-top: 15px;
     transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.page-card:hover .page-card-actions {
-    opacity: 1;
-    visibility: visible;
 }
 
 .page-card-actions .btn {
